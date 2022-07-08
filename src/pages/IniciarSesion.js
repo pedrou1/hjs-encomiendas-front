@@ -6,6 +6,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../services/ServicioUsuarios';
+import * as Constantes from '../utils/constantes';
 
 const IniciarSesion = (prop) => {
 	const navigate = useNavigate();
@@ -17,12 +18,13 @@ const IniciarSesion = (prop) => {
 		},
 		validationSchema: validationSchema,
 
-		onSubmit: async (values) => {
-			servicioUsuarios.iniciarSesion(values);
-
-			// 		if (exists) {
-			// 			navigate('/');
-			// 		}
+		onSubmit: async (values, e) => {
+			const res = await servicioUsuarios.iniciarSesion(values);
+			if (res == Constantes.Success) {
+				console.log('success');
+			} else if (res == Constantes.Error) {
+				// 			navigate('/404');
+			}
 		},
 	});
 

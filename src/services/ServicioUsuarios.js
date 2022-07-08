@@ -30,7 +30,6 @@ export const iniciarSesion = async (usuario) => {
 	try {
 		const res = await axios.post(url + '/login', usuario);
 		if (res.status == 200) {
-			console.log(res.data);
 			return res.data;
 		}
 	} catch (err) {

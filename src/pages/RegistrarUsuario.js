@@ -5,8 +5,9 @@ import * as yup from 'yup';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../services/ServicioUsuarios';
+import * as Constantes from '../utils/constantes';
 
-const Registrar = () => {
+const RegistrarUsuario = () => {
 	const formik = useFormik({
 		initialValues: {
 			nombre: '',
@@ -18,9 +19,16 @@ const Registrar = () => {
 		},
 		validationSchema: validationSchema,
 
-		onSubmit: (values) => {
-			console.log(values);
-			servicioUsuarios.registrarUsuario(values);
+		onSubmit: async (values, e) => {
+			const res = await servicioUsuarios.registrarUsuario(values);
+
+			if (res == Constantes.Success) {
+				console.log('success');
+			} else if (res == Constantes.UsernameAlreadyExist) {
+				e.setFieldError('usuario', 'El usuario ya existe, ingresa otro');
+			} else if (res == Constantes.Error) {
+				// 			navigate('/404');
+			}
 		},
 	});
 
@@ -40,7 +48,7 @@ const Registrar = () => {
 					alignItems: 'center',
 				}}
 			>
-				<Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+				<Avatar sx={{ m: 1, bgcolor: '#2196f3' }}>
 					<LockOutlinedIcon />
 				</Avatar>
 				<Typography component="h1" variant="h5">
@@ -200,4 +208,4 @@ const validationSchema = yup.object({
 	password: yup.string('Introduce tu contraseña').min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres').required('Introduce tu contraseña'),
 });
 
-export default Registrar;
+export default RegistrarUsuario;
