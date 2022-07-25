@@ -1,12 +1,13 @@
-import { Avatar, Button, TextField, Link, CssBaseline, Box, Grid, Typography, Container } from '@mui/material';
-import styled from '@emotion/styled';
+import { Avatar, Button, TextField, Link, CssBaseline, Box, Grid, Typography, Container, Paper } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../services/ServicioUsuarios';
-import * as Constantes from '../utils/constantes';
+import * as authService from '../services/AuthService';
+import * as Constantes from '../utils/Constantes';
+import { toast } from 'react-toastify';
 
 const IniciarSesion = (prop) => {
 	const navigate = useNavigate();
@@ -20,106 +21,116 @@ const IniciarSesion = (prop) => {
 
 		onSubmit: async (values, e) => {
 			const res = await servicioUsuarios.iniciarSesion(values);
-			if (res == Constantes.Success) {
-				console.log('success');
-			} else if (res == Constantes.Error) {
+			if (res.operationResult == Constantes.SUCCESS) {
+				res.usuario.permiso = Constantes.PERMISO_ADMINISTRADOR; // FIXME
+				authService.setLoggedIn(res.jwtToken, res.usuario);
+				window.location = '/usuarios';
+				toast.success('Bienvenido');
+			} else if (res.operationResult == Constantes.ERROR) {
 				// 			navigate('/404');
 			}
 		},
 	});
-
 	const classes = useStyles();
-
+	console.log(classes.label);
 	return (
-		<Container component="main" maxWidth="xs">
+		<Container component="main" maxWidth="sm">
 			<Helmet>
 				<title>Iniciar sesión</title>
 			</Helmet>
 			<CssBaseline />
-			<Box
+			<Paper
+				data-aos="zoom-in"
+				data-aos-duration={200}
 				sx={{
-					marginTop: 10,
-					display: 'flex',
-					flexDirection: 'column',
-					alignItems: 'center',
+					paddingX: 6,
+					paddingY: 2,
 				}}
 			>
-				<Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-					<LockOutlinedIcon />
-				</Avatar>
-				<Typography component="h1" variant="h5">
-					Inicia sesión
-				</Typography>
-				<Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-					<Grid container spacing={2}>
-						<Grid item xs={12}>
-							<TextField
-								InputLabelProps={{
-									classes: {
-										root: classes.label,
-									},
-								}}
-								name="usuario"
-								variant="outlined"
-								fullWidth
-								id="usuario"
-								label="Usuario"
-								autoFocus
-								value={formik.values.usuario}
-								onChange={formik.handleChange}
-								error={formik.touched.usuario && Boolean(formik.errors.usuario)}
-								helperText={formik.touched.usuario && formik.errors.usuario}
-							/>
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+					}}
+				>
+					<Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+						<LockOutlinedIcon />
+					</Avatar>
+					<Typography component="h1" variant="h5">
+						Inicia sesión
+					</Typography>
+					<Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
+						<Grid container spacing={2}>
+							<Grid item xs={12}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="usuario"
+									variant="outlined"
+									fullWidth
+									id="usuario"
+									label="Usuario"
+									autoFocus
+									value={formik.values.usuario}
+									onChange={formik.handleChange}
+									error={formik.touched.usuario && Boolean(formik.errors.usuario)}
+									helperText={formik.touched.usuario && formik.errors.usuario}
+								/>
+							</Grid>
+							<Grid item xs={12}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="password"
+									variant="outlined"
+									fullWidth
+									id="password"
+									label="Contraseña"
+									type="password"
+									value={formik.values.password}
+									onChange={formik.handleChange}
+									error={formik.touched.password && Boolean(formik.errors.password)}
+									helperText={formik.touched.password && formik.errors.password}
+								/>
+							</Grid>
+							<Box mt={12} />
 						</Grid>
-						<Grid item xs={12}>
-							<TextField
-								InputLabelProps={{
-									classes: {
-										root: classes.label,
-									},
-								}}
-								name="password"
-								variant="outlined"
-								fullWidth
-								id="password"
-								label="Contraseña"
-								type="password"
-								value={formik.values.password}
-								onChange={formik.handleChange}
-								error={formik.touched.password && Boolean(formik.errors.password)}
-								helperText={formik.touched.password && formik.errors.password}
-							/>
-						</Grid>
-						<Box mt={12} />
-					</Grid>
-					<Button type="submit" color="primary" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-						Iniciar sesión
-					</Button>
-					<Grid container>
-						<Grid item xs>
-							<Box mt={2} />
-						</Grid>
+						<Button type="submit" color="primary" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+							Iniciar sesión
+						</Button>
+						<Grid container>
+							<Grid item xs>
+								<Box mt={2} />
+							</Grid>
 
-						<Grid item>
-							<Box mt={2} />
-							<Link href={process.env.PUBLIC_URL + '/'} variant="body2">
-								¿No tienes una cuenta? Regístrate
-							</Link>
+							<Grid item>
+								<Box mt={2} />
+								<Link href={process.env.PUBLIC_URL + '/'} variant="body2">
+									¿No tienes una cuenta? Regístrate
+								</Link>
+							</Grid>
 						</Grid>
-					</Grid>
+					</Box>
 				</Box>
-			</Box>
+			</Paper>
 		</Container>
 	);
 };
 
-const useStyles = styled((theme) => ({
+const useStyles = () => ({
 	label: {
 		backgroundColor: '#fafafa',
 		paddingLeft: 6,
 		paddingRight: 8,
 	},
-}));
+});
 
 const validationSchema = yup.object({
 	usuario: yup

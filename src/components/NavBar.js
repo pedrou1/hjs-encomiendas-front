@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, useMediaQuery, Button, Drawer, List, ListItem, ListItemText, Grid, Box, useTheme } from '@mui/material';
-import styled from '@emotion/styled';
 import MenuIcon from '@mui/icons-material/Menu';
+import PersonIcon from '@mui/icons-material/Person';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link } from 'react-router-dom';
+import * as authService from '../services/AuthService';
 
-const NavBar = (prop) => {
+const NavBar = ({ usuario }) => {
 	const classes = useStyles();
 	const [anchor, setAnchor] = useState(null); // expande la navbar movil
 	const theme = useTheme();
@@ -15,11 +16,16 @@ const NavBar = (prop) => {
 		setAnchor(event.currentTarget);
 	};
 
+	const cerrarSesion = () => {
+		authService.logout();
+		window.location.reload();
+	};
+
 	return (
 		<div className={classes.root}>
 			<AppBar style={{ background: '#212121' }}>
 				<Toolbar>
-					<Typography variant="h5" component="p" color="primary" className={classes.title} style={{ color: 'white' }}>
+					<Typography variant="h5" component="p" color="primary" style={{ color: 'white' }}>
 						HJS Encomiendas
 					</Typography>
 					{isMobile ? ( // abre la navbar movil
@@ -32,14 +38,16 @@ const NavBar = (prop) => {
 									keepMounted: true,
 								}}
 							>
-								<IconButton onClick={() => setAnchor(null)} className={classes.menuButton}>
+								<IconButton onClick={() => setAnchor(null)}>
 									<CloseIcon />
 								</IconButton>
 								<div>
 									<List>
-										<ListItem button component={Link} to={process.env.PUBLIC_URL + '/iniciar-sesion'}>
-											<ListItemText primary={'Iniciar sesion'} />
-										</ListItem>
+										{!usuario && (
+											<ListItem button component={Link} to={process.env.PUBLIC_URL + '/iniciar-sesion'}>
+												<ListItemText primary={'Iniciar sesion'} />
+											</ListItem>
+										)}
 										<ListItem button component={Link} to={process.env.PUBLIC_URL + '/'}>
 											<ListItemText primary={'Registrarse'} />
 										</ListItem>
@@ -49,7 +57,7 @@ const NavBar = (prop) => {
 
 							<Grid item xs />
 
-							<IconButton color="primary" className={classes.menuButton} edge="end" aria-label="menu" onClick={handleMenu}>
+							<IconButton color="primary" edge="end" aria-label="menu" onClick={handleMenu}>
 								<MenuIcon className={classes.white} />
 							</IconButton>
 						</>
@@ -70,28 +78,61 @@ const NavBar = (prop) => {
 							</Box>
 							<>
 								<>
-									<Button
-										variant="text"
-										color="white"
-										component={Link}
-										className={classes.white}
-										style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
-										onClick={() => setAnchor(null)}
-										to={process.env.PUBLIC_URL + '/iniciar-sesion'}
-									>
-										Iniciar sesion
-									</Button>
-									<Button
-										variant="text"
-										color="white"
-										component={Link}
-										className={classes.white}
-										style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
-										onClick={() => setAnchor(null)}
-										to={process.env.PUBLIC_URL + '/'}
-									>
-										Registrarse
-									</Button>
+									{usuario ? (
+										<>
+											<Button
+												startIcon={<PersonIcon />}
+												variant="text"
+												color="white"
+												component={Link}
+												className={classes.white}
+												style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+												onClick={() => setAnchor(null)}
+												to={process.env.PUBLIC_URL + '/perfil'}
+											>
+												{usuario.usuario}
+											</Button>
+											<Button
+												variant="text"
+												color="white"
+												component={Link}
+												className={classes.white}
+												style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+												onClick={() => {
+													setAnchor(null);
+													cerrarSesion();
+												}}
+												to={process.env.PUBLIC_URL + '/cerrar-sesion'}
+											>
+												Cerrar sesión
+											</Button>
+										</>
+									) : (
+										<>
+											<Button
+												variant="text"
+												color="white"
+												component={Link}
+												className={classes.white}
+												style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+												onClick={() => setAnchor(null)}
+												to={process.env.PUBLIC_URL + '/iniciar-sesion'}
+											>
+												Iniciar sesion
+											</Button>
+											<Button
+												variant="text"
+												color="white"
+												component={Link}
+												className={classes.white}
+												style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+												onClick={() => setAnchor(null)}
+												to={process.env.PUBLIC_URL + '/'}
+											>
+												Registrarse
+											</Button>
+										</>
+									)}
 								</>
 							</>
 						</>
@@ -102,15 +143,9 @@ const NavBar = (prop) => {
 	);
 };
 
-const useStyles = styled((theme) => ({
+const useStyles = () => ({
 	root: {
 		flexGrow: 1,
-	},
-	menuButton: {
-		marginRight: theme.spacing(2),
-	},
-	title: {
-		marginRight: theme.spacing(2),
 	},
 	menu: {
 		flex: 1,
@@ -118,6 +153,6 @@ const useStyles = styled((theme) => ({
 	white: {
 		color: 'white',
 	},
-}));
+});
 
 export default NavBar;

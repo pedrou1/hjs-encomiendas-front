@@ -1,29 +1,24 @@
+import http from '../services/httpService';
 import axios from 'axios';
 
 const url = process.env.REACT_APP_API_URL + 'api/usuario';
 
-export const obtener = async (prop) => {
+export const obtenerUsuarios = async (params) => {
 	try {
-		const res = await axios.get(url);
+		const res = await http.get(`${url}`, { params });
 		if (res.status == 200) {
-			console.log(res.data);
 			return res.data;
 		}
-	} catch (err) {
-		console.log(`ERROR: ${err}`);
-	}
+	} catch (err) {}
 };
 
 export const registrarUsuario = async (usuario) => {
 	try {
-		const res = await axios.post(url + '/registrar', usuario);
+		const res = await http.post(url + '/registrar', usuario);
 		if (res.status == 200) {
-			console.log(res.data);
 			return res.data;
 		}
-	} catch (err) {
-		console.log(`ERROR: ${err}`);
-	}
+	} catch (err) {}
 };
 
 export const iniciarSesion = async (usuario) => {
@@ -32,7 +27,5 @@ export const iniciarSesion = async (usuario) => {
 		if (res.status == 200) {
 			return res.data;
 		}
-	} catch (err) {
-		console.log(`ERROR: ${err}`);
-	}
+	} catch (err) {}
 };
