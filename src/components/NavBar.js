@@ -25,9 +25,6 @@ const NavBar = ({ usuario }) => {
 		<div className={classes.root}>
 			<AppBar style={{ background: '#212121' }}>
 				<Toolbar>
-					<Typography variant="h5" component="p" color="primary" style={{ color: 'white' }}>
-						HJS Encomiendas
-					</Typography>
 					{isMobile ? ( // abre la navbar movil
 						<>
 							<Drawer
@@ -73,7 +70,7 @@ const NavBar = ({ usuario }) => {
 									to={process.env.PUBLIC_URL + '/'}
 									onClick={() => setAnchor(null)}
 								>
-									Inicio
+									HJS Encomiendas
 								</Button>
 							</Box>
 							<>
@@ -88,7 +85,7 @@ const NavBar = ({ usuario }) => {
 												className={classes.white}
 												style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
 												onClick={() => setAnchor(null)}
-												to={process.env.PUBLIC_URL + '/perfil'}
+												to={`/usuario/${usuario.idUsuario}`}
 											>
 												{usuario.usuario}
 											</Button>
@@ -104,7 +101,7 @@ const NavBar = ({ usuario }) => {
 												}}
 												to={process.env.PUBLIC_URL + '/cerrar-sesion'}
 											>
-												Cerrar sesión
+												SALIR
 											</Button>
 										</>
 									) : (

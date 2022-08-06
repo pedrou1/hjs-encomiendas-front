@@ -1,34 +1,57 @@
-import { Avatar, Button, TextField, Link, CssBaseline, Box, Grid, Typography, Container, Paper } from '@mui/material';
+import { Button, TextField, Link, CssBaseline, Box, Grid, Typography, Container, Paper, MenuItem } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../services/ServicioUsuarios';
 import * as Constantes from '../utils/Constantes';
+import { defaultStyles } from '../utils/defaultStyles';
+import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-const RegistrarUsuario = () => {
+const CrearUsuario = () => {
+	const navigate = useNavigate();
+	const { state } = useLocation();
+	const usuario = state?.usuario ? state.usuario : null;
+
 	const formik = useFormik({
-		initialValues: {
-			nombre: '',
-			apellido: '',
-			telefono: '',
-			email: '',
-			usuario: '',
-			password: '',
-		},
+		initialValues: usuario
+			? {
+					nombre: usuario.nombre,
+					apellido: usuario.apellido,
+					telefono: usuario.telefono ? usuario.telefono : '',
+					email: usuario.email ? usuario.email : '',
+					usuario: usuario.usuario ? usuario.usuario : '',
+					categoriaUsuario: usuario.categoriaUsuario.idCategoria,
+					password: '',
+			  }
+			: {
+					nombre: '',
+					apellido: '',
+					telefono: '',
+					email: '',
+					usuario: '',
+					password: '',
+					categoriaUsuario: Constantes.ID_CLIENTE,
+			  },
 		validationSchema: validationSchema,
 
 		onSubmit: async (values, e) => {
-			const val = { ...values, categoriaUsuario: { idCategoria: 1 } };
-			const res = await servicioUsuarios.registrarUsuario(val);
+			try {
+				const usuarioIngresado = { ...values, idUsuario: usuario?.idUsuario, categoriaUsuario: { idCategoria: values.categoriaUsuario } };
 
-			if (res == Constantes.SUCCESS) {
-				console.log('success');
-			} else if (res == Constantes.ALREADYEXIST) {
-				e.setFieldError('usuario', 'El usuario ya existe, ingresa otro');
-			} else if (res == Constantes.ERROR) {
-				// 			navigate('/404');
-			}
+				const res = usuario ? await servicioUsuarios.modificarUsuario(usuarioIngresado) : await servicioUsuarios.registrarUsuario(usuarioIngresado);
+
+				if (res.operationResult == Constantes.SUCCESS) {
+					navigate('/usuarios');
+					toast.success(`Usuario ${usuario ? 'modificado' : 'creado'} correctamente`);
+				} else if (res.operationResult == Constantes.ALREADYEXIST) {
+					e.setFieldError('usuario', 'El usuario ya existe, ingresa otro');
+				} else if (res.operationResult == Constantes.ERROR) {
+					toast.error('Ha ocurrido un error');
+					navigate('/error');
+				}
+			} catch (error) {}
 		},
 	});
 
@@ -37,13 +60,12 @@ const RegistrarUsuario = () => {
 	return (
 		<Container component="main" maxWidth="sm">
 			<Helmet>
-				<title>Registrarse</title>
+				<title>Crear usuario</title>
 			</Helmet>
 			<CssBaseline />
 			<Paper
-				data-aos="zoom-in"
-				data-aos-duration={200}
 				sx={{
+					...defaultStyles.boxShadow,
 					paddingX: 6,
 					paddingY: 2,
 				}}
@@ -55,11 +77,8 @@ const RegistrarUsuario = () => {
 						alignItems: 'center',
 					}}
 				>
-					<Avatar sx={{ m: 1, bgcolor: '#2196f3' }}>
-						<LockOutlinedIcon />
-					</Avatar>
 					<Typography component="h1" variant="h5">
-						Regístrate
+						{usuario ? 'Editar Usuario' : 'Crear Usuario'}
 					</Typography>
 					<Box component="form" noValidate onSubmit={formik.handleSubmit} sx={{ mt: 3 }}>
 						<Grid container spacing={2}>
@@ -138,6 +157,31 @@ const RegistrarUsuario = () => {
 									helperText={formik.touched.telefono && formik.errors.telefono}
 								/>
 							</Grid>
+							<Grid item xs={12}>
+								<TextField
+									select
+									name="categoriaUsuario"
+									variant="outlined"
+									label="Categoría"
+									margin="normal"
+									fullWidth
+									value={formik.values.categoriaUsuario}
+									onChange={formik.handleChange('categoriaUsuario')}
+									error={formik.touched.categoriaUsuario && Boolean(formik.errors.categoriaUsuario)}
+									helperText={formik.touched.categoriaUsuario && formik.errors.categoriaUsuario}
+								>
+									<MenuItem value={Constantes.ID_CLIENTE}>
+										<span>Cliente</span>
+									</MenuItem>
+									<MenuItem value={Constantes.ID_CHOFER}>
+										<span>Chofer</span>
+									</MenuItem>
+									<MenuItem value={Constantes.ID_ADMINISTRADOR}>
+										<span>Administrador</span>
+									</MenuItem>
+								</TextField>
+							</Grid>
+
 							<Grid item xs={12} sm={6}>
 								<TextField
 									InputLabelProps={{
@@ -178,17 +222,22 @@ const RegistrarUsuario = () => {
 							</Grid>
 							<Box mt={12} />
 						</Grid>
-						<Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, mb: 2 }}>
-							Registrarse
-						</Button>
-						<Grid container justifyContent="flex-end">
-							<Grid item>
-								<Box mt={2} />
-								<Link href={process.env.PUBLIC_URL + '/iniciar-sesion'} variant="body2">
-									¿Ya tienes una cuenta? Iniciar sesión
-								</Link>
-							</Grid>
-						</Grid>
+						<Box
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+							}}
+						>
+							<div className="align-self-end">
+								<Button variant="outlined" color="primary" sx={{ mt: 3, mb: 2 }} className="m-1" component={RouterLink} to={-1}>
+									Cancelar
+								</Button>
+								<Button type="submit" variant="contained" color="primary" sx={{ mt: 3, mb: 2 }} className="m-1">
+									Crear
+								</Button>
+							</div>
+						</Box>
 					</Box>
 				</Box>
 			</Paper>
@@ -209,11 +258,9 @@ const validationSchema = yup.object({
 	apellido: yup.string('Introduce tu apellido').min(4, 'El apellido debe tener una longitud mínima de 4 caracteres').required('Introduce tu apellido'),
 	email: yup.string('Introduce tu email').email('Formato incorrecto'),
 	telefono: yup.string('Introduce tu teléfono').min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres'),
-	usuario: yup
-		.string('Introduce tu nombre de usuario')
-		.min(4, 'El nombre de usuario debe tener una longitud mínima de 4 caracteres')
-		.required('Introduce tu nombre de usuario'),
-	password: yup.string('Introduce tu contraseña').min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres').required('Introduce tu contraseña'),
+	usuario: yup.string('Introduce tu nombre de usuario').min(4, 'El nombre de usuario debe tener una longitud mínima de 4 caracteres'),
+	password: yup.string('Introduce tu contraseña').min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres'),
+	categoriaUsuario: yup.string('Introduce la categoría').required('Introduce la categoría'),
 });
 
-export default RegistrarUsuario;
+export default CrearUsuario;

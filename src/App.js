@@ -16,6 +16,8 @@ import { useEffect, useState } from 'react';
 import * as authService from './services/AuthService';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import CrearUsuario from './pages/CrearUsuario';
+import VerUsuario from './pages/VerUsuario';
 
 function App() {
 	const [usuario, setUsuario] = useState(null);
@@ -41,6 +43,24 @@ function App() {
 						element={
 							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
 								<Usuarios />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/crear-usuario"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<CrearUsuario />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/usuario/:idUsuario"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<VerUsuario />
 							</ProtectedRoute>
 						}
 					/>

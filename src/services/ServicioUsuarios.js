@@ -12,9 +12,36 @@ export const obtenerUsuarios = async (params) => {
 	} catch (err) {}
 };
 
+export const obtenerUsuario = async (idUsuario) => {
+	try {
+		const res = await http.get(`${url}/${idUsuario}`);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
+export const eliminarUsuario = async (idUsuario) => {
+	try {
+		const res = await http.delete(`${url}/${idUsuario}`);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
 export const registrarUsuario = async (usuario) => {
 	try {
 		const res = await http.post(url + '/registrar', usuario);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
+export const modificarUsuario = async (usuario) => {
+	try {
+		const res = await http.post(url + '/modificar', usuario);
 		if (res.status == 200) {
 			return res.data;
 		}

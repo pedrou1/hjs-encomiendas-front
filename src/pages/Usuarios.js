@@ -3,11 +3,15 @@ import { Helmet } from 'react-helmet';
 import { useEffect, useState } from 'react';
 import * as servicioUsuarios from '../services/ServicioUsuarios';
 import Table from '../components/Table';
+import AddIcon from '@mui/icons-material/Add';
+import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Usuarios = () => {
 	const [usuarios, setUsuarios] = useState([]);
 	const [countUsuarios, setCountUsuarios] = useState(0);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		getUsuarios();
@@ -22,6 +26,10 @@ const Usuarios = () => {
 
 	const onPageChange = async (paginationData) => {
 		await getUsuarios(paginationData);
+	};
+
+	const goToVerUsuario = (row) => {
+		navigate(`/usuario/${row.idUsuario}`);
 	};
 
 	return (
@@ -41,14 +49,21 @@ const Usuarios = () => {
 					<Button
 						variant="contained"
 						style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
-						onClick={() => null}
-						// component={Link}
-						// to={process.env.PUBLIC_URL + '/crear-usuarios'}
+						component={RouterLink}
+						to="/crear-usuario"
+						endIcon={<AddIcon />}
 					>
-						Nuevo
+						Crear nuevo
 					</Button>
 				</div>
-				<Table title="Usuarios" data={usuarios} columns={columnas} totalRows={countUsuarios} onPageChange={onPageChange} />
+				<Table
+					title="Usuarios"
+					data={usuarios}
+					columns={columnas}
+					totalRows={countUsuarios}
+					onPageChange={onPageChange}
+					onRowClicked={goToVerUsuario}
+				/>
 			</Box>
 		</Container>
 	);

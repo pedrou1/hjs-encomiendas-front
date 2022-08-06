@@ -7,3 +7,7 @@ export const USUARIO = 'usuario';
 
 export const PERMISO_ADMINISTRADOR = 1;
 export const PERMISO_CHOFER = 2;
+
+export const ID_CLIENTE = 1;
+export const ID_CHOFER = 2;
+export const ID_ADMINISTRADOR = 3;

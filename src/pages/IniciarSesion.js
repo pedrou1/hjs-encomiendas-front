@@ -27,7 +27,9 @@ const IniciarSesion = (prop) => {
 				window.location = '/usuarios';
 				toast.success('Bienvenido');
 			} else if (res.operationResult == Constantes.ERROR) {
-				// 			navigate('/404');
+				toast.error('Ha ocurrido un error');
+			} else if (res.operationResult == Constantes.INVALIDUSER) {
+				toast.error('Usuario o contraseña incorrecta');
 			}
 		},
 	});

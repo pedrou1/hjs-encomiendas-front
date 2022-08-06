@@ -3,8 +3,9 @@ import { Paper, TableContainer, Box, Skeleton, CircularProgress } from '@mui/mat
 import SortIcon from '@mui/icons-material/ArrowDownward';
 import { useState, useEffect } from 'react';
 import FolderOffIcon from '@mui/icons-material/FolderOff';
+import { defaultStyles } from '../utils/defaultStyles';
 
-const Table = ({ title, data, columns, totalRows, onPageChange }) => {
+const Table = ({ title, data, columns, totalRows, onPageChange, onRowClicked }) => {
 	const [pageSize, setPageSize] = useState(10);
 	const [pageIndex, setPageIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ const Table = ({ title, data, columns, totalRows, onPageChange }) => {
 	};
 
 	return (
-		<TableContainer component={Paper} className="mb-4 mt-2" sx={data && !data.length && !loading ? styles.tableEmpty : {}}>
+		<TableContainer component={Paper} className="mb-4 mt-2" sx={data && !data.length && !loading ? styles.tableEmpty : { ...defaultStyles.boxShadow }}>
 			<DataTable
 				title={<div className="mt-4">{title}</div>}
 				columns={columns}
@@ -54,7 +55,8 @@ const Table = ({ title, data, columns, totalRows, onPageChange }) => {
 				onChangePage={(page, totalRows) => {
 					handlePageChange(page, totalRows);
 				}}
-				onRowClicked={(row) => console.log('clicked', row)}
+				pointerOnHover
+				onRowClicked={onRowClicked}
 				noDataComponent={
 					<div className="text-muted" style={styles.emptyText}>
 						<FolderOffIcon />
