@@ -1,8 +1,8 @@
 import { Button, CssBaseline, Box, Container } from '@mui/material';
 import { Helmet } from 'react-helmet';
 import { useEffect, useState } from 'react';
-import * as servicioUsuarios from '../services/ServicioUsuarios';
-import Table from '../components/Table';
+import * as servicioUsuarios from '../../services/ServicioUsuarios';
+import Table from '../../components/Table';
 import AddIcon from '@mui/icons-material/Add';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';

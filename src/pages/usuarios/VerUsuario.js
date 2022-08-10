@@ -1,20 +1,19 @@
 import { Button, Grid, Typography, Container, Paper, Stack } from '@mui/material';
 import { Helmet } from 'react-helmet';
-import * as servicioUsuarios from '../services/ServicioUsuarios';
-import * as Constantes from '../utils/Constantes';
+import * as servicioUsuarios from '../../services/ServicioUsuarios';
+import * as Constantes from '../../utils/Constantes';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
-import DateRangeOutlinedIcon from '@mui/icons-material/DateRangeOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import LocationIcon from '@mui/icons-material/Place';
 import EmailIcon from '@mui/icons-material/MailOutline';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import EditIcon from '@mui/icons-material/Edit';
-import Table from '../components/Table';
+import Table from '../../components/Table';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ModalDialog from '../components/ModalDialog';
+import ModalDialog from '../../components/ModalDialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
