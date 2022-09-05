@@ -20,6 +20,8 @@ import CrearEditarUsuario from './pages/usuarios/CrearEditarUsuario';
 import VerUsuario from './pages/usuarios/VerUsuario';
 import UnidadesTransporte from './pages/unidadesTransporte/UnidadesTransporte';
 import CrearEditarUnidad from './pages/unidadesTransporte/CrearEditarUnidad';
+import CrearEditarPedido from './pages/pedidos/CrearEditarPedido';
+import Pedidos from './pages/pedidos/Pedidos';
 
 function App() {
 	const [usuario, setUsuario] = useState(null);
@@ -81,6 +83,26 @@ function App() {
 						element={
 							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
 								<CrearEditarUnidad />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/pedidos"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<Pedidos />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/crear-pedido"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<CrearEditarPedido />
 							</ProtectedRoute>
 						}
 					/>

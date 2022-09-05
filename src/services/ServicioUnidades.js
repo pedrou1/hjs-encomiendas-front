@@ -1,5 +1,4 @@
 import http from '../services/httpService';
-import axios from 'axios';
 
 const url = process.env.REACT_APP_API_URL + 'api/unidadtransporte';
 
