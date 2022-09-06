@@ -1,7 +1,7 @@
 import { Button, Grid, Typography, Container, Paper, Stack } from '@mui/material';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../../services/ServicioUsuarios';
-import * as Constantes from '../../utils/Constantes';
+import * as Constantes from '../../utils/constantes';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';

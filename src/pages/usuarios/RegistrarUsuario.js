@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../../services/ServicioUsuarios';
-import * as Constantes from '../../utils/Constantes';
+import * as Constantes from '../../utils/constantes';
 
 const RegistrarUsuario = () => {
 	const formik = useFormik({

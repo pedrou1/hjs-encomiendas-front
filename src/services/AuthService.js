@@ -1,4 +1,4 @@
-import * as Constantes from '../utils/Constantes';
+import * as Constantes from '../utils/constantes';
 
 export function getJwt() {
 	return localStorage.getItem(Constantes.USUARIO) ? JSON.parse(localStorage.getItem(Constantes.USUARIO)).token : null;

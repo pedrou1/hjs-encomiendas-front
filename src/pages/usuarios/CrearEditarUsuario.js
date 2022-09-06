@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../../services/ServicioUsuarios';
-import * as Constantes from '../../utils/Constantes';
+import * as Constantes from '../../utils/constantes';
 import { defaultStyles } from '../../utils/defaultStyles';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom';

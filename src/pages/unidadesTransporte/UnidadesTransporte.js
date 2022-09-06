@@ -9,7 +9,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import ModalDialog from '../../components/ModalDialog';
 import { toast } from 'react-toastify';
-import * as Constantes from '../../utils/Constantes';
+import * as Constantes from '../../utils/constantes';
 
 const UnidadesTransporte = () => {
 	const [unidades, setUnidades] = useState([]);

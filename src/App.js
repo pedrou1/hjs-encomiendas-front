@@ -6,7 +6,7 @@ import NavBar from './components/NavBar';
 import IniciarSesion from './pages/usuarios/IniciarSesion';
 import Usuarios from './pages/usuarios/Usuarios';
 import ProtectedRoute from './pages/common/ProtectedRoute';
-import * as Constantes from './utils/Constantes';
+import * as Constantes from './utils/constantes';
 import Error from './pages/common/Error';
 import { ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
