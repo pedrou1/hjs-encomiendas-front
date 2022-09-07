@@ -6,6 +6,7 @@ import {
 	LocalShipping as TransporteIcon,
 	Map as MapaIcon,
 	MonetizationOn as GastoIcon,
+	BarChart,
 } from '@mui/icons-material';
 import { useLocation } from 'react-router-dom';
 import SidebarLink from './SidebarLink';
@@ -47,9 +48,10 @@ const structure = [
 		icon: <PedidosIcon />,
 	},
 	{ id: 2, label: 'Unidades', link: '/unidades', icon: <TransporteIcon /> },
-	{ id: 3, label: 'Gastos', link: '/gastos', icon: <GastoIcon /> },
+	{ id: 3, label: 'Estadísticas', link: '/estadisticas', icon: <BarChart /> },
+	{ id: 4, label: 'Gastos', link: '/gastos', icon: <GastoIcon /> },
 	{
-		id: 4,
+		id: 5,
 		label: 'Direcciones',
 		link: '/direcciones',
 		icon: <MapaIcon />,

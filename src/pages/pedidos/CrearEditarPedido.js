@@ -24,12 +24,11 @@ const CrearEditarPedido = () => {
 	const [cliente, setCliente] = useState({});
 	const [unidad, setUnidad] = useState({});
 	const [estado, setEstado] = useState(estados[0]);
-	const [horaLimite, setHoraLimite] = useState(null);
 
 	const navigate = useNavigate();
 	const { state } = useLocation();
-
 	const pedido = state?.pedido ? state.pedido : null;
+	const [horaLimite, setHoraLimite] = useState(pedido?.horaLimite ? new Date(pedido.horaLimite) : null);
 
 	useEffect(() => {
 		if (pedido) {
@@ -46,7 +45,6 @@ const CrearEditarPedido = () => {
 		initialValues: pedido
 			? {
 					estado: pedido.estado,
-					horaLimite: pedido.horaLimite ? pedido.horaLimite : '',
 					tamaño: pedido.tamaño,
 					peso: pedido.peso,
 					cubicaje: pedido.cubicaje,
@@ -54,7 +52,6 @@ const CrearEditarPedido = () => {
 			  }
 			: {
 					estado: 0,
-					horaLimite: '00:00',
 					tamaño: 0,
 					peso: 0,
 					cubicaje: 0,
@@ -64,9 +61,6 @@ const CrearEditarPedido = () => {
 
 		onSubmit: async (values, e) => {
 			try {
-				// if (!isNaN(horaLimite)) {
-				// 	setHoraLimite(horaLimite);
-				// }
 				if (chofer.value && cliente.value && unidad.value) {
 					const pedidoIngresado = {
 						...values,
@@ -75,6 +69,7 @@ const CrearEditarPedido = () => {
 						idCliente: cliente.value,
 						idTransporte: unidad.value,
 						estado: estado.value,
+						horaLimite: !isNaN(horaLimite) ? horaLimite : null,
 					};
 
 					const res = pedido ? await servicioPedidos.modificarPedido(pedidoIngresado) : await servicioPedidos.registrarPedido(pedidoIngresado);
@@ -209,14 +204,8 @@ const CrearEditarPedido = () => {
 									<TimePicker
 										label="Hora límite"
 										value={horaLimite}
-										onChange={formik.handleChange}
-										renderInput={(params) => (
-											<TextField
-												error={formik.touched.horaLimite && Boolean(formik.errors.horaLimite)}
-												helperText={formik.touched.horaLimite && formik.errors.horaLimite}
-												{...params}
-											/>
-										)}
+										onChange={(h) => setHoraLimite(h)}
+										renderInput={(params) => <TextField {...params} />}
 									/>
 								</LocalizationProvider>
 							</Grid>
@@ -289,7 +278,6 @@ const useStyles = () => ({
 
 const validationSchema = yup.object({
 	estado: 0,
-	horaLimite: '',
 	orden: 0,
 	tipo: 0,
 	tamaño: 0,

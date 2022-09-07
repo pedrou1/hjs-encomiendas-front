@@ -22,6 +22,7 @@ import UnidadesTransporte from './pages/unidadesTransporte/UnidadesTransporte';
 import CrearEditarUnidad from './pages/unidadesTransporte/CrearEditarUnidad';
 import CrearEditarPedido from './pages/pedidos/CrearEditarPedido';
 import Pedidos from './pages/pedidos/Pedidos';
+import Estadisticas from './pages/estadisticas/Estadisticas';
 
 function App() {
 	const [usuario, setUsuario] = useState(null);
@@ -103,6 +104,16 @@ function App() {
 						element={
 							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
 								<CrearEditarPedido />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/estadisticas"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<Estadisticas />
 							</ProtectedRoute>
 						}
 					/>
