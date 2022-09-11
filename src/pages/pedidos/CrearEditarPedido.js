@@ -287,5 +287,6 @@ export default CrearEditarPedido;
 
 const estados = [
 	{ label: 'Pendiente', value: 1 },
-	{ label: 'Finalizado', value: 2 },
+	{ label: 'En Curso', value: 2 },
+	{ label: 'Finalizado', value: 3},
 ];

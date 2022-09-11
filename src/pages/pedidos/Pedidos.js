@@ -1,4 +1,5 @@
-import { Button, CssBaseline, Box, Container } from '@mui/material';
+import { Button, CssBaseline, Box, Container, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Helmet } from 'react-helmet';
 import { useEffect, useState } from 'react';
 import * as servicioPedidos from '../../services/ServicioPedidos';
@@ -6,16 +7,27 @@ import Table from '../../components/Table';
 import AddIcon from '@mui/icons-material/Add';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import ModalDialog from '../../components/ModalDialog';
+import { toast } from 'react-toastify';
+import * as Constantes from '../../utils/constantes';
 
 const Pedidos = () => {
 	const [pedidos, setPedidos] = useState([]);
 	const [countPedidos, setCountPedidos] = useState(0);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
+	const [openModal, setOpenModal] = useState(false);
+	const [pedidoSeleccionado, setPedidoSeleccionado] = useState({});
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		getPedidos();
 	}, []);
+
+	useEffect(() => {
+		if (pedidoSeleccionado?.idPedido) {
+			setOpenModal(!openModal);
+		}
+	}, [pedidoSeleccionado]);
 
 	const getPedidos = async (newPaginationData) => {
 		if (newPaginationData) setPaginationData(newPaginationData);
@@ -28,14 +40,59 @@ const Pedidos = () => {
 		await getPedidos(paginationData);
 	};
 
+	const actualizarTabla = async () => {
+		await getPedidos();
+		setPedidoSeleccionado({});
+	};
+
 	const goToVerPedidos = (pedido) => {
 		navigate('/crear-pedido', { state: { pedido: pedido } });
 	};
+
+	const handleDelete = async () => {
+		if (pedidoSeleccionado?.idPedido) {
+			const res = await servicioPedidos.eliminarPedido(pedidoSeleccionado.idPedido);
+			if (res.operationResult == Constantes.SUCCESS) {
+				setOpenModal(false);
+				actualizarTabla();
+				toast.success('Pedido eliminado correctamente');
+			} else {
+				toast.error('Ha ocurrido un error');
+				navigate('/error');
+			}
+		}
+	};
+
+	const columnas = [
+		...cols,
+		{
+			button: true,
+			cell: (row) => (
+				<IconButton aria-label="delete" size="small" color="error" onClick={() => setPedidoSeleccionado(row)}>
+					<DeleteIcon />
+				</IconButton>
+			),
+		},
+	];
+
 	return (
 		<Container component="main">
 			<Helmet>
 				<title>Pedidos</title>
 			</Helmet>
+			<ModalDialog
+				open={openModal}
+				titulo="Eliminar"
+				mensaje={`¿Quieres eliminar el pedido seleccionado?`}
+				esEliminar={true}
+				handleClose={() => {
+					setOpenModal(false);
+					setTimeout(() => {
+						setPedidoSeleccionado({});
+					}, 300);
+				}}
+				handleAccept={handleDelete}
+			/>
 			<CssBaseline />
 			<Box
 				sx={{
@@ -55,7 +112,14 @@ const Pedidos = () => {
 						Crear nuevo
 					</Button>
 				</div>
-				<Table title="Pedidos" data={pedidos} columns={columnas} totalRows={countPedidos} onPageChange={onPageChange} onRowClicked={goToVerPedidos} />
+				<Table
+					title="Pedidos"
+					data={pedidos}
+					columns={columnas}
+					totalRows={countPedidos}
+					onPageChange={onPageChange}
+					onRowClicked={goToVerPedidos}
+				/>
 			</Box>
 		</Container>
 	);
@@ -63,7 +127,7 @@ const Pedidos = () => {
 
 export default Pedidos;
 
-const columnas = [
+const cols = [
 	{
 		name: 'Chofer',
 		selector: (row) => `${row.chofer.nombre} ${row.chofer.apellido}`,
@@ -106,6 +170,6 @@ const columnas = [
 		selector: (row) => row.estado,
 		sortable: true,
 		grow: 1,
-		cell: (row) => <div>{row.estado == 1 ? 'Pendiente' : 'Finalizado'}</div>,
+		cell: (row) => <div>{row.estado === 1 ? 'Pendiente' : 'Finalizado'}</div>,
 	},
 ];
