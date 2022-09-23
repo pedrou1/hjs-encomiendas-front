@@ -11,6 +11,7 @@ const Usuarios = () => {
 	const [usuarios, setUsuarios] = useState([]);
 	const [countUsuarios, setCountUsuarios] = useState(0);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
+	const [loadingFinished, setLoadingFinished] = useState(false);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -19,9 +20,10 @@ const Usuarios = () => {
 
 	const getUsuarios = async (newPaginationData) => {
 		if (newPaginationData) setPaginationData(newPaginationData);
-		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios(newPaginationData || paginationData);
+		const { usuarios, totalRows, operationResult } = await servicioUsuarios.obtenerUsuarios(newPaginationData || paginationData);
 		setUsuarios(usuarios);
 		setCountUsuarios(totalRows);
+		setLoadingFinished(operationResult == 1 ? true : false);
 	};
 
 	const onPageChange = async (paginationData) => {
@@ -61,6 +63,7 @@ const Usuarios = () => {
 					data={usuarios}
 					columns={columnas}
 					totalRows={countUsuarios}
+					isLoadingFinished={loadingFinished}
 					onPageChange={onPageChange}
 					onRowClicked={goToVerUsuario}
 				/>

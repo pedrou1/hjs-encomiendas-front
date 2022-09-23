@@ -16,6 +16,7 @@ const UnidadesTransporte = () => {
 	const [countUnidades, setCountUnidades] = useState(0);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 	const [openModal, setOpenModal] = useState(false);
+	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [unidadSeleccionada, setUnidadSeleccionada] = useState({});
 	const navigate = useNavigate();
 
@@ -31,10 +32,11 @@ const UnidadesTransporte = () => {
 
 	const getUnidades = async (newPaginationData) => {
 		if (newPaginationData) setPaginationData(newPaginationData);
-		const { unidadesTransporte, totalRows } = await servicioUnidades.obtenerUnidades(newPaginationData || paginationData);
+		const { unidadesTransporte, totalRows, operationResult } = await servicioUnidades.obtenerUnidades(newPaginationData || paginationData);
 		if (unidadesTransporte) {
 			setUnidades(unidadesTransporte);
 			setCountUnidades(totalRows);
+			setLoadingFinished(operationResult == 1 ? true : false);
 		}
 	};
 
@@ -119,6 +121,7 @@ const UnidadesTransporte = () => {
 					data={unidades}
 					columns={columnas}
 					totalRows={countUnidades}
+					isLoadingFinished={loadingFinished}
 					onPageChange={onPageChange}
 					onRowClicked={goToEditar}
 				/>

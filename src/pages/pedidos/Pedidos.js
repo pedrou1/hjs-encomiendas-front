@@ -10,12 +10,14 @@ import { useNavigate } from 'react-router-dom';
 import ModalDialog from '../../components/ModalDialog';
 import { toast } from 'react-toastify';
 import * as Constantes from '../../utils/constantes';
+import { columnasPedidos } from '../../utils/columnasTablas';
 
 const Pedidos = () => {
 	const [pedidos, setPedidos] = useState([]);
 	const [countPedidos, setCountPedidos] = useState(0);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 	const [openModal, setOpenModal] = useState(false);
+	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [pedidoSeleccionado, setPedidoSeleccionado] = useState({});
 	const navigate = useNavigate();
 
@@ -31,9 +33,10 @@ const Pedidos = () => {
 
 	const getPedidos = async (newPaginationData) => {
 		if (newPaginationData) setPaginationData(newPaginationData);
-		const { pedidos, totalRows } = await servicioPedidos.obtenerPedidos(newPaginationData || paginationData);
+		const { pedidos, totalRows, operationResult } = await servicioPedidos.obtenerPedidos(newPaginationData || paginationData);
 		setPedidos(pedidos);
 		setCountPedidos(totalRows);
+		setLoadingFinished(operationResult == 1 ? true : false);
 	};
 
 	const onPageChange = async (paginationData) => {
@@ -64,7 +67,7 @@ const Pedidos = () => {
 	};
 
 	const columnas = [
-		...cols,
+		...columnasPedidos,
 		{
 			button: true,
 			cell: (row) => (
@@ -117,6 +120,7 @@ const Pedidos = () => {
 					data={pedidos}
 					columns={columnas}
 					totalRows={countPedidos}
+					isLoadingFinished={loadingFinished}
 					onPageChange={onPageChange}
 					onRowClicked={goToVerPedidos}
 				/>
@@ -126,50 +130,3 @@ const Pedidos = () => {
 };
 
 export default Pedidos;
-
-const cols = [
-	{
-		name: 'Chofer',
-		selector: (row) => `${row.chofer.nombre} ${row.chofer.apellido}`,
-		sortable: true,
-		grow: 1,
-	},
-	{
-		name: 'Cliente',
-		selector: (row) => `${row.cliente.nombre} ${row.cliente.apellido}`,
-		sortable: true,
-		grow: 1,
-	},
-	{
-		name: 'Unidad',
-		selector: (row) => row.transporte.nombre,
-		sortable: true,
-		grow: 1,
-	},
-	{
-		name: 'Peso',
-		selector: (row) => row.peso,
-		sortable: true,
-		grow: 1.1,
-	},
-	{
-		name: 'Tamaño',
-		selector: (row) => row.tamaño,
-		sortable: true,
-		grow: 1.1,
-		cell: (row) => <div>{row.tamaño + ' m2'}</div>,
-	},
-	{
-		name: 'Tarifa',
-		selector: (row) => row.tarifa,
-		sortable: true,
-		grow: 1.2,
-	},
-	{
-		name: 'Estado',
-		selector: (row) => row.estado,
-		sortable: true,
-		grow: 1,
-		cell: (row) => <div>{row.estado === 1 ? 'Pendiente' : 'Finalizado'}</div>,
-	},
-];

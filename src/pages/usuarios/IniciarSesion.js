@@ -114,7 +114,7 @@ const IniciarSesion = (prop) => {
 
 							<Grid item>
 								<Box mt={2} />
-								<Link href={process.env.PUBLIC_URL + '/'} variant="body2">
+								<Link href={process.env.PUBLIC_URL + '/registrar'} variant="body2">
 									¿No tienes una cuenta? Regístrate
 								</Link>
 							</Grid>

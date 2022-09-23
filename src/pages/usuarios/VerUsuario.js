@@ -1,7 +1,8 @@
-import { Button, Grid, Typography, Container, Paper, Stack } from '@mui/material';
+import { Button, Grid, Typography, Container, Paper, Stack, Skeleton } from '@mui/material';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../../services/ServicioUsuarios';
 import * as Constantes from '../../utils/constantes';
+import { columnasPedidos } from '../../utils/columnasTablas';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
@@ -16,17 +17,23 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModalDialog from '../../components/ModalDialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import * as servicioPedidos from '../../services/ServicioPedidos';
 
 const VerUsuario = () => {
 	const [usuario, setUsuario] = useState({});
 	const [openModal, setOpenModal] = useState(false);
 	const { idUsuario } = useParams();
+	const [pedidos, setPedidos] = useState([]);
+	const [countPedidos, setCountPedidos] = useState(0);
+	const [loadingFinished, setLoadingFinished] = useState(false);
+	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 
 	const navigate = useNavigate();
 	const classes = useStyles();
 
 	useEffect(() => {
 		getUsuario();
+		getPedidos();
 	}, []);
 
 	const getUsuario = async () => {
@@ -45,6 +52,27 @@ const VerUsuario = () => {
 			toast.error('Ha ocurrido un error');
 			navigate('/error');
 		}
+	};
+
+	const getPedidos = async (newPaginationData) => {
+		if (newPaginationData) {
+			setPaginationData(newPaginationData);
+		}
+		const params = newPaginationData || paginationData;
+		params.idUsuarioPedido = idUsuario;
+		const { pedidos, totalRows, operationResult } = await servicioPedidos.obtenerPedidos(params);
+		setPedidos(pedidos);
+		setCountPedidos(totalRows);
+		setLoadingFinished(operationResult == 1 ? true : false);
+	};
+
+	const onPageChange = async (paginationData) => {
+		paginationData.idUsuarioPedido = idUsuario;
+		await getPedidos(paginationData);
+	};
+
+	const goToVerPedidos = (pedido) => {
+		navigate('/crear-pedido', { state: { pedido: pedido } });
 	};
 
 	return (
@@ -81,47 +109,68 @@ const VerUsuario = () => {
 					<Grid container spacing={2}>
 						<Grid item xs={12} lg={4}>
 							<Paper sx={{ p: 2, paddingX: { xs: 4, md: 2 } }} className="mt-2">
-								<Stack alignItems="center" spacing={1}>
-									<Typography variant="h6">{`${usuario.nombre} ${usuario.apellido}`}</Typography>
-								</Stack>
-								<br />
-								<Stack spacing={1}>
-									<UserInfoText>
-										<PersonOutlineOutlinedIcon />
-										<Typography variant="body1">Hombre</Typography>
-									</UserInfoText>
-									{usuario.telefono && (
-										<UserInfoText>
-											<LocalPhoneOutlinedIcon />
-											<Typography variant="body1">{usuario.telefono}</Typography>
-										</UserInfoText>
-									)}
-									<UserInfoText>
-										<AdminPanelSettingsIcon />
-										<Typography variant="body1">{usuario.categoriaUsuario?.nombre}</Typography>
-									</UserInfoText>
-									{usuario.email && (
-										<UserInfoText>
-											<EmailIcon />
-											<Typography variant="body1">{usuario.email}</Typography>
-										</UserInfoText>
-									)}
-									<UserInfoText>
-										<LocationIcon />
-										<Typography variant="body1">Gral Artigas</Typography>
-									</UserInfoText>
-									{usuario.usuario && (
-										<UserInfoText>
-											<CheckOutlinedIcon />
-											<Typography variant="body1">Tiene cuenta</Typography>
-										</UserInfoText>
-									)}
-								</Stack>
+								{usuario.nombre ? (
+									<>
+										<Stack alignItems="center" spacing={1}>
+											<Typography variant="h6">{`${usuario.nombre} ${usuario.apellido}`}</Typography>
+										</Stack>
+										<br />
+										<Stack spacing={1}>
+											<UserInfoText>
+												<PersonOutlineOutlinedIcon />
+												<Typography variant="body1">Hombre</Typography>
+											</UserInfoText>
+											{usuario.telefono && (
+												<UserInfoText>
+													<LocalPhoneOutlinedIcon />
+													<Typography variant="body1">{usuario.telefono}</Typography>
+												</UserInfoText>
+											)}
+											<UserInfoText>
+												<AdminPanelSettingsIcon />
+												<Typography variant="body1">{usuario.categoriaUsuario?.nombre}</Typography>
+											</UserInfoText>
+											{usuario.email && (
+												<UserInfoText>
+													<EmailIcon />
+													<Typography variant="body1">{usuario.email}</Typography>
+												</UserInfoText>
+											)}
+											{usuario.direccion && (
+												<UserInfoText>
+													<LocationIcon />
+													<Typography variant="body1">{usuario.direccion}</Typography>
+												</UserInfoText>
+											)}
+											{usuario.usuario && (
+												<UserInfoText>
+													<CheckOutlinedIcon />
+													<Typography variant="body1">Tiene cuenta</Typography>
+												</UserInfoText>
+											)}
+										</Stack>
+									</>
+								) : (
+									<>
+										<Skeleton variant="text" sx={{ my: 0, mx: 1, p: 2 }} />
+										{[...Array(3)].map((e, i) => (
+											<Skeleton key={i} variant="text" sx={{ my: 1, mx: 1, p: 1 }} />
+										))}
+									</>
+								)}
 							</Paper>
 						</Grid>
 						<Grid item xs={12} lg={8}>
 							<Stack direction="column" spacing={2}>
-								<Table title="Pedidos" data={[]} columns={[]} totalRows={1} onPageChange={() => null} />
+								<Table
+									title="Pedidos"
+									data={pedidos}
+									columns={columnasPedidos}
+									totalRows={countPedidos}
+									isLoadingFinished={loadingFinished}
+									onPageChange={onPageChange}
+									onRowClicked={goToVerPedidos}
+								/>
 							</Stack>
 						</Grid>
 					</Grid>
