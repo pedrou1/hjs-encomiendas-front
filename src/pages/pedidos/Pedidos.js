@@ -17,6 +17,7 @@ const Pedidos = () => {
 	const [countPedidos, setCountPedidos] = useState(0);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 	const [openModal, setOpenModal] = useState(false);
+	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [pedidoSeleccionado, setPedidoSeleccionado] = useState({});
 	const navigate = useNavigate();
 
@@ -32,9 +33,10 @@ const Pedidos = () => {
 
 	const getPedidos = async (newPaginationData) => {
 		if (newPaginationData) setPaginationData(newPaginationData);
-		const { pedidos, totalRows } = await servicioPedidos.obtenerPedidos(newPaginationData || paginationData);
+		const { pedidos, totalRows, operationResult } = await servicioPedidos.obtenerPedidos(newPaginationData || paginationData);
 		setPedidos(pedidos);
 		setCountPedidos(totalRows);
+		setLoadingFinished(operationResult == 1 ? true : false);
 	};
 
 	const onPageChange = async (paginationData) => {
@@ -113,7 +115,15 @@ const Pedidos = () => {
 						Crear nuevo
 					</Button>
 				</div>
-				<Table title="Pedidos" data={pedidos} columns={columnas} totalRows={countPedidos} onPageChange={onPageChange} onRowClicked={goToVerPedidos} />
+				<Table
+					title="Pedidos"
+					data={pedidos}
+					columns={columnas}
+					totalRows={countPedidos}
+					isLoadingFinished={loadingFinished}
+					onPageChange={onPageChange}
+					onRowClicked={goToVerPedidos}
+				/>
 			</Box>
 		</Container>
 	);

@@ -12,6 +12,7 @@ const RegistrarUsuario = () => {
 			nombre: '',
 			apellido: '',
 			telefono: '',
+			direccion: '',
 			email: '',
 			usuario: '',
 			password: '',
@@ -138,6 +139,26 @@ const RegistrarUsuario = () => {
 									helperText={formik.touched.telefono && formik.errors.telefono}
 								/>
 							</Grid>
+							<Grid item xs={12}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="direccion"
+									variant="outlined"
+									fullWidth
+									id="direccion"
+									label="Dirección"
+									autoFocus
+									value={formik.values.direccion}
+									onChange={formik.handleChange}
+									error={formik.touched.direccion && Boolean(formik.errors.direccion)}
+									helperText={formik.touched.direccion && formik.errors.direccion}
+								/>
+							</Grid>
+
 							<Grid item xs={12} sm={6}>
 								<TextField
 									InputLabelProps={{
@@ -209,6 +230,7 @@ const validationSchema = yup.object({
 	apellido: yup.string('Introduce tu apellido').min(4, 'El apellido debe tener una longitud mínima de 4 caracteres').required('Introduce tu apellido'),
 	email: yup.string('Introduce tu email').email('Formato incorrecto'),
 	telefono: yup.string('Introduce tu teléfono').min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres'),
+	direccion: yup.string('Introduce tu dirección').min(4, 'La dirección debe tener una longitud mínima de 4 caracteres'),
 	usuario: yup
 		.string('Introduce tu nombre de usuario')
 		.min(4, 'El nombre de usuario debe tener una longitud mínima de 4 caracteres')

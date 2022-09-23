@@ -5,18 +5,15 @@ import { useState, useEffect } from 'react';
 import FolderOffIcon from '@mui/icons-material/FolderOff';
 import { defaultStyles } from '../utils/defaultStyles';
 
-const Table = ({ title, data, columns, totalRows, onPageChange, onRowClicked }) => {
+const Table = ({ title, data = [], columns, totalRows, onPageChange, onRowClicked, isLoadingFinished }) => {
 	const [pageSize, setPageSize] = useState(10);
 	const [pageIndex, setPageIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		if (data.length) setLoading(false);
-		else {
-			setTimeout(() => {
-				setLoading(false);
-			}, 600);
-		}
+
+		if (isLoadingFinished && !data.length) setLoading(false);
 	}, [data]);
 
 	const handlePageChange = async (page) => {

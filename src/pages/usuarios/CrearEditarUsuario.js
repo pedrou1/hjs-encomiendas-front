@@ -20,6 +20,7 @@ const CrearEditarUsuario = () => {
 					nombre: usuario.nombre,
 					apellido: usuario.apellido,
 					telefono: usuario.telefono ? usuario.telefono : '',
+					direccion: usuario.direccion ? usuario.direccion : '',
 					email: usuario.email ? usuario.email : '',
 					usuario: usuario.usuario ? usuario.usuario : '',
 					categoriaUsuario: usuario.idCategoria,
@@ -29,6 +30,7 @@ const CrearEditarUsuario = () => {
 					nombre: '',
 					apellido: '',
 					telefono: '',
+					direccion: '',
 					email: '',
 					usuario: '',
 					password: '',
@@ -157,6 +159,26 @@ const CrearEditarUsuario = () => {
 									helperText={formik.touched.telefono && formik.errors.telefono}
 								/>
 							</Grid>
+
+							<Grid item xs={12}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="direccion"
+									variant="outlined"
+									fullWidth
+									id="direccion"
+									label="Dirección"
+									autoFocus
+									value={formik.values.direccion}
+									onChange={formik.handleChange}
+									error={formik.touched.direccion && Boolean(formik.errors.direccion)}
+									helperText={formik.touched.direccion && formik.errors.direccion}
+								/>
+							</Grid>
 							<Grid item xs={12}>
 								<TextField
 									select
@@ -258,6 +280,7 @@ const validationSchema = yup.object({
 	apellido: yup.string('Introduce tu apellido').min(4, 'El apellido debe tener una longitud mínima de 4 caracteres').required('Introduce tu apellido'),
 	email: yup.string('Introduce tu email').email('Formato incorrecto'),
 	telefono: yup.string('Introduce tu teléfono').min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres'),
+	direccion: yup.string('Introduce tu dirección').min(4, 'La dirección debe tener una longitud mínima de 4 caracteres'),
 	usuario: yup.string('Introduce tu nombre de usuario').min(4, 'El nombre de usuario debe tener una longitud mínima de 4 caracteres'),
 	password: yup.string('Introduce tu contraseña').min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres'),
 	categoriaUsuario: yup.string('Introduce la categoría').required('Introduce la categoría'),
