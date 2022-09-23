@@ -11,7 +11,7 @@ const Table = ({ title, data, columns, totalRows, onPageChange, onRowClicked }) 
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (data.length) setLoading(false);
+		if (data && data.length) setLoading(false);
 		else {
 			setTimeout(() => {
 				setLoading(false);

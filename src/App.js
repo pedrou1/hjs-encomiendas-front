@@ -23,6 +23,8 @@ import CrearEditarUnidad from './pages/unidadesTransporte/CrearEditarUnidad';
 import CrearEditarPedido from './pages/pedidos/CrearEditarPedido';
 import Pedidos from './pages/pedidos/Pedidos';
 import Estadisticas from './pages/estadisticas/Estadisticas';
+import CrearEditarTipoPedido from './pages/tipoPedidos/CrearEditarTipoPedido';
+import TiposPedidos from './pages/tipoPedidos/TiposPedidos';
 
 function App() {
 	const [usuario, setUsuario] = useState(null);
@@ -114,6 +116,26 @@ function App() {
 						element={
 							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
 								<Estadisticas />
+							</ProtectedRoute>
+						}
+					/>
+					
+					<Route
+						path="/crear-editar-pedido"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<CrearEditarTipoPedido />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/tipos-pedidos"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<TiposPedidos />
 							</ProtectedRoute>
 						}
 					/>

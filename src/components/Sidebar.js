@@ -7,6 +7,7 @@ import {
 	Map as MapaIcon,
 	MonetizationOn as GastoIcon,
 	BarChart,
+	Title,
 } from '@mui/icons-material';
 import { useLocation } from 'react-router-dom';
 import SidebarLink from './SidebarLink';
@@ -47,11 +48,19 @@ const structure = [
 		link: '/pedidos',
 		icon: <PedidosIcon />,
 	},
-	{ id: 2, label: 'Unidades', link: '/unidades', icon: <TransporteIcon /> },
-	{ id: 3, label: 'Estadísticas', link: '/estadisticas', icon: <BarChart /> },
-	{ id: 4, label: 'Gastos', link: '/gastos', icon: <GastoIcon /> },
+
 	{
-		id: 5,
+		id: 2,
+		label: 'Tipo de Pedidos',
+		link: '/tipos-pedidos',
+		icon: <Title />,
+	},
+
+	{ id: 3, label: 'Unidades', link: '/unidades', icon: <TransporteIcon /> },
+	{ id: 4, label: 'Estadísticas', link: '/estadisticas', icon: <BarChart /> },
+	{ id: 5, label: 'Gastos', link: '/gastos', icon: <GastoIcon /> },
+	{
+		id: 6,
 		label: 'Direcciones',
 		link: '/direcciones',
 		icon: <MapaIcon />,

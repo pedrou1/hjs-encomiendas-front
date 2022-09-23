@@ -18,13 +18,14 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { AsyncPaginate } from 'react-select-async-paginate';
 import Select from 'react-select';
 import SelectPaginate from '../../components/SelectPaginate';
+import * as servicioTipoPedidos from '../../services/ServicioTipoPedidos';
 
 const CrearEditarPedido = () => {
 	const [chofer, setChofer] = useState({});
 	const [cliente, setCliente] = useState({});
 	const [unidad, setUnidad] = useState({});
 	const [estado, setEstado] = useState(estados[0]);
-	const [tipoPedido, setTipoPedido] = useState(Constantes.tipoPedido[0]);
+	const [tipoPedido, setTipoPedido] = useState({});
 
 
 	const navigate = useNavigate();
@@ -39,7 +40,7 @@ const CrearEditarPedido = () => {
 			const chofer = { value: pedido.chofer.idUsuario, label: `${pedido.chofer.nombre} ${pedido.chofer.apellido}` };
 			const cliente = { value: pedido.cliente.idUsuario, label: `${pedido.cliente.nombre} ${pedido.cliente.apellido}` };
 			const unidad = { value: pedido.transporte.idUnidadTransporte, label: `${pedido.transporte.nombre}` };
-			const tipoPedido = Constantes.tipoPedido.find((tipo) => tipo.value ==  pedido.tipo);
+			const tipoPedido = { value: pedido.tipoPedido.idTipoPedido, label: `${pedido.tipoPedido.nombre}` };
 			setChofer(chofer);
 			setCliente(cliente);
 			setUnidad(unidad);
@@ -48,7 +49,7 @@ const CrearEditarPedido = () => {
 	}, []);
 
 	useEffect(() => {
-		setTarifa(tipoPedido.tarifa)
+		if(tipoPedido?.tarifa) setTarifa(tipoPedido.tarifa)
 	}
 	, [tipoPedido]);
 
@@ -57,7 +58,7 @@ const CrearEditarPedido = () => {
 			? {
 					estado: pedido.estado,
 					tamaño: pedido.tamaño,
-					tipoPedido: Constantes.tipoPedido,
+					tipoPedido: pedido.tipoPedido,
 					peso: pedido.peso,
 					cubicaje: pedido.cubicaje,
 			  }
@@ -134,6 +135,16 @@ const CrearEditarPedido = () => {
 		};
 	}
 
+	async function loadOptionTiposPedido(search, loadedOptions) {
+		const filters = JSON.stringify(search.trim().split(/\s+/));
+		const { tiposPedido, totalRows } = await servicioTipoPedidos.obtenerTipoPedidos({ PageIndex: loadedOptions.length, PageSize: 5, filters });
+
+		return {
+			options: [...tiposPedido.map((t) => ({ value: t.idTipoPedido, label: `${t.nombre}` }))],
+			hasMore: loadedOptions.length < totalRows,
+		};
+	}
+
 	const customStyles = {
 		option: (provided, state) => {
 			return {
@@ -197,12 +208,12 @@ const CrearEditarPedido = () => {
 								styles={customStyles}
 							/>
 
-							<InputLabel sx={{ mt: 2 }}>Tipo de Pedido</InputLabel>
-							<Select
-								menuPortalTarget={document.querySelector('body')}
+<SelectPaginate
+								label="Tipo de Pedido"
+								errorLabel="Ingrese un tipo de pedido"
 								value={tipoPedido}
-								options={Constantes.tipoPedido}
-								onChange={(e) => setTipoPedido(e)}
+								loadOptions={loadOptionTiposPedido}
+								setOnChange={(e) => setTipoPedido(e)}
 							/>
 
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
