@@ -1,6 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import RegistrarUsuario from './pages/usuarios/RegistrarUsuario';
 import NavBar from './components/NavBar';
 import IniciarSesion from './pages/usuarios/IniciarSesion';
@@ -39,7 +39,8 @@ function App() {
 				<NavBar usuario={usuario} />
 				{usuario?.idCategoria == Constantes.PERMISO_ADMINISTRADOR ? <Sidebar /> : <></>}
 				<Routes>
-					<Route path="/" exact element={<RegistrarUsuario />} />
+					<Route path="/" element={<Navigate replace to="/iniciar-sesion" />} />
+					<Route path="/registrar" exact element={<RegistrarUsuario />} />
 					<Route path="/iniciar-sesion" exact element={<IniciarSesion />} />
 					<Route path="/error" exact element={<Error />} />
 					<Route

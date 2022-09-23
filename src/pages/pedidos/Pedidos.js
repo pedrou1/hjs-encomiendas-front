@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import ModalDialog from '../../components/ModalDialog';
 import { toast } from 'react-toastify';
 import * as Constantes from '../../utils/constantes';
+import { columnasPedidos } from '../../utils/columnasTablas';
 
 const Pedidos = () => {
 	const [pedidos, setPedidos] = useState([]);
@@ -64,7 +65,7 @@ const Pedidos = () => {
 	};
 
 	const columnas = [
-		...cols,
+		...columnasPedidos,
 		{
 			button: true,
 			cell: (row) => (
@@ -112,64 +113,10 @@ const Pedidos = () => {
 						Crear nuevo
 					</Button>
 				</div>
-				<Table
-					title="Pedidos"
-					data={pedidos}
-					columns={columnas}
-					totalRows={countPedidos}
-					onPageChange={onPageChange}
-					onRowClicked={goToVerPedidos}
-				/>
+				<Table title="Pedidos" data={pedidos} columns={columnas} totalRows={countPedidos} onPageChange={onPageChange} onRowClicked={goToVerPedidos} />
 			</Box>
 		</Container>
 	);
 };
 
 export default Pedidos;
-
-const cols = [
-	{
-		name: 'Chofer',
-		selector: (row) => `${row.chofer.nombre} ${row.chofer.apellido}`,
-		sortable: true,
-		grow: 1,
-	},
-	{
-		name: 'Cliente',
-		selector: (row) => `${row.cliente.nombre} ${row.cliente.apellido}`,
-		sortable: true,
-		grow: 1,
-	},
-	{
-		name: 'Unidad',
-		selector: (row) => row.transporte.nombre,
-		sortable: true,
-		grow: 1,
-	},
-	{
-		name: 'Peso',
-		selector: (row) => row.peso,
-		sortable: true,
-		grow: 1.1,
-	},
-	{
-		name: 'Tamaño',
-		selector: (row) => row.tamaño,
-		sortable: true,
-		grow: 1.1,
-		cell: (row) => <div>{row.tamaño + ' m2'}</div>,
-	},
-	{
-		name: 'Tarifa',
-		selector: (row) => row.tarifa,
-		sortable: true,
-		grow: 1.2,
-	},
-	{
-		name: 'Estado',
-		selector: (row) => row.estado,
-		sortable: true,
-		grow: 1,
-		cell: (row) => <div>{row.estado === 1 ? 'Pendiente' : 'Finalizado'}</div>,
-	},
-];

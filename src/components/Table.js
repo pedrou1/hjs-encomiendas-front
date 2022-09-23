@@ -15,7 +15,7 @@ const Table = ({ title, data, columns, totalRows, onPageChange, onRowClicked }) 
 		else {
 			setTimeout(() => {
 				setLoading(false);
-			}, 6000);
+			}, 600);
 		}
 	}, [data]);
 

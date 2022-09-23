@@ -2,6 +2,7 @@ import { Button, Grid, Typography, Container, Paper, Stack } from '@mui/material
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../../services/ServicioUsuarios';
 import * as Constantes from '../../utils/constantes';
+import { columnasPedidos } from '../../utils/columnasTablas';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
@@ -16,17 +17,22 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModalDialog from '../../components/ModalDialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import * as servicioPedidos from '../../services/ServicioPedidos';
 
 const VerUsuario = () => {
 	const [usuario, setUsuario] = useState({});
 	const [openModal, setOpenModal] = useState(false);
 	const { idUsuario } = useParams();
+	const [pedidos, setPedidos] = useState([]);
+	const [countPedidos, setCountPedidos] = useState(0);
+	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 
 	const navigate = useNavigate();
 	const classes = useStyles();
 
 	useEffect(() => {
 		getUsuario();
+		getPedidos();
 	}, []);
 
 	const getUsuario = async () => {
@@ -45,6 +51,26 @@ const VerUsuario = () => {
 			toast.error('Ha ocurrido un error');
 			navigate('/error');
 		}
+	};
+
+	const getPedidos = async (newPaginationData) => {
+		if (newPaginationData) {
+			setPaginationData(newPaginationData);
+		}
+		const params = newPaginationData || paginationData;
+		params.idUsuarioPedido = idUsuario;
+		const { pedidos, totalRows } = await servicioPedidos.obtenerPedidos(params);
+		setPedidos(pedidos);
+		setCountPedidos(totalRows);
+	};
+
+	const onPageChange = async (paginationData) => {
+		paginationData.idUsuarioPedido = idUsuario;
+		await getPedidos(paginationData);
+	};
+
+	const goToVerPedidos = (pedido) => {
+		navigate('/crear-pedido', { state: { pedido: pedido } });
 	};
 
 	return (
@@ -121,7 +147,14 @@ const VerUsuario = () => {
 						</Grid>
 						<Grid item xs={12} lg={8}>
 							<Stack direction="column" spacing={2}>
-								<Table title="Pedidos" data={[]} columns={[]} totalRows={1} onPageChange={() => null} />
+								<Table
+									title="Pedidos"
+									data={pedidos}
+									columns={columnasPedidos}
+									totalRows={countPedidos}
+									onPageChange={onPageChange}
+									onRowClicked={goToVerPedidos}
+								/>
 							</Stack>
 						</Grid>
 					</Grid>

@@ -45,7 +45,7 @@ const NavBar = ({ usuario }) => {
 												<ListItemText primary={'Iniciar sesion'} />
 											</ListItem>
 										)}
-										<ListItem button component={Link} to={process.env.PUBLIC_URL + '/'}>
+										<ListItem button component={Link} to={process.env.PUBLIC_URL + '/registrar'}>
 											<ListItemText primary={'Registrarse'} />
 										</ListItem>
 									</List>
@@ -124,7 +124,7 @@ const NavBar = ({ usuario }) => {
 												className={classes.white}
 												style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
 												onClick={() => setAnchor(null)}
-												to={process.env.PUBLIC_URL + '/'}
+												to={process.env.PUBLIC_URL + '/registrar'}
 											>
 												Registrarse
 											</Button>
