@@ -24,10 +24,14 @@ const CrearEditarPedido = () => {
 	const [cliente, setCliente] = useState({});
 	const [unidad, setUnidad] = useState({});
 	const [estado, setEstado] = useState(estados[0]);
+	const [tipoPedido, setTipoPedido] = useState(Constantes.tipoPedido[0]);
+
 
 	const navigate = useNavigate();
 	const { state } = useLocation();
 	const pedido = state?.pedido ? state.pedido : null;
+	const [tarifa, setTarifa] = useState(pedido ? pedido.tarifa : 0);
+
 	const [horaLimite, setHoraLimite] = useState(pedido?.horaLimite ? new Date(pedido.horaLimite) : null);
 
 	useEffect(() => {
@@ -35,27 +39,34 @@ const CrearEditarPedido = () => {
 			const chofer = { value: pedido.chofer.idUsuario, label: `${pedido.chofer.nombre} ${pedido.chofer.apellido}` };
 			const cliente = { value: pedido.cliente.idUsuario, label: `${pedido.cliente.nombre} ${pedido.cliente.apellido}` };
 			const unidad = { value: pedido.transporte.idUnidadTransporte, label: `${pedido.transporte.nombre}` };
+			const tipoPedido = Constantes.tipoPedido.find((tipo) => tipo.value ==  pedido.tipo);
 			setChofer(chofer);
 			setCliente(cliente);
 			setUnidad(unidad);
+			setTipoPedido(tipoPedido);
 		}
 	}, []);
+
+	useEffect(() => {
+		setTarifa(tipoPedido.tarifa)
+	}
+	, [tipoPedido]);
 
 	const formik = useFormik({
 		initialValues: pedido
 			? {
 					estado: pedido.estado,
 					tamaño: pedido.tamaño,
+					tipoPedido: Constantes.tipoPedido,
 					peso: pedido.peso,
 					cubicaje: pedido.cubicaje,
-					tarifa: pedido.tarifa,
 			  }
 			: {
 					estado: 0,
 					tamaño: 0,
+					tipoPedido: 0,
 					peso: 0,
 					cubicaje: 0,
-					tarifa: 0,
 			  },
 		validationSchema: validationSchema,
 
@@ -67,6 +78,7 @@ const CrearEditarPedido = () => {
 						idPedido: pedido?.idPedido,
 						idChofer: chofer.value,
 						idCliente: cliente.value,
+						tipo: tipoPedido.value,
 						idTransporte: unidad.value,
 						estado: estado.value,
 						horaLimite: !isNaN(horaLimite) ? horaLimite : null,
@@ -185,6 +197,14 @@ const CrearEditarPedido = () => {
 								styles={customStyles}
 							/>
 
+							<InputLabel sx={{ mt: 2 }}>Tipo de Pedido</InputLabel>
+							<Select
+								menuPortalTarget={document.querySelector('body')}
+								value={tipoPedido}
+								options={Constantes.tipoPedido}
+								onChange={(e) => setTipoPedido(e)}
+							/>
+
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
 								<TextField
 									className="text-start"
@@ -238,10 +258,8 @@ const CrearEditarPedido = () => {
 									fullWidth
 									id="tarifa"
 									label="Tarifa"
-									value={formik.values.tarifa}
-									onChange={formik.handleChange}
-									error={formik.touched.tarifa && Boolean(formik.errors.tarifa)}
-									helperText={formik.touched.tarifa && formik.errors.tarifa}
+									value={tarifa}
+									onChange={(t) => setTarifa(t)}
 								/>
 							</Grid>
 						</Grid>
