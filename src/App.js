@@ -25,6 +25,8 @@ import Pedidos from './pages/pedidos/Pedidos';
 import Estadisticas from './pages/estadisticas/Estadisticas';
 import CrearEditarTipoPedido from './pages/tipoPedidos/CrearEditarTipoPedido';
 import TiposPedidos from './pages/tipoPedidos/TiposPedidos';
+import Gastos from './pages/gastos/Gastos';
+import CrearEditarGasto from './pages/gastos/CrearEditarGasto';
 
 function App() {
 	const [usuario, setUsuario] = useState(null);
@@ -137,6 +139,26 @@ function App() {
 						element={
 							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
 								<TiposPedidos />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/gastos"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<Gastos />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/crear-editar-gasto"
+						exact
+						element={
+							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+								<CrearEditarGasto />
 							</ProtectedRoute>
 						}
 					/>
