@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import es from 'date-fns/locale/es';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AsyncPaginate } from 'react-select-async-paginate';
 import Select from 'react-select';
 import SelectPaginate from '../../components/SelectPaginate';
@@ -27,7 +27,7 @@ const CrearEditarGasto = () => {
 	const navigate = useNavigate();
 	const { state } = useLocation();
 	const gasto = state?.gasto ? state.gasto : null;
-	const [costo, setCosto] = useState(gasto ? gasto.costo : 0);
+	const [fecha, setFecha] = useState(gasto?.fecha ? new Date(gasto.fecha) : null);
 
 	useEffect(() => {
 		if (gasto) {
@@ -35,26 +35,21 @@ const CrearEditarGasto = () => {
 			const unidad = { value: gasto.transporte.idUnidadTransporte, label: `${gasto.transporte.nombre}` };
 			setChofer(chofer);
 			setUnidad(unidad);
-            setCosto(costo);
+            
 		}
 	}, []);
 
-	useEffect(() => {
-		if(gasto?.costo) setCosto(gasto.costo)
-	}
-	, [gasto]);
+
 
 	const formik = useFormik({
 		initialValues: gasto
 			? {
 					descripcion: gasto.descripcion,
 					costo: gasto.costo,
-					fecha: gasto.fecha,
 			  }
 			: {
 					descripcion: '',
 					costo: 0,
-					fecha: '',
 			  },
 		validationSchema: validationSchema,
 
@@ -66,6 +61,7 @@ const CrearEditarGasto = () => {
 						idGasto: gasto?.idGasto,
 						idChofer: chofer.value,
 						idTransporte: unidad.value,
+						fecha,
 					};
 
 					const res = gasto ? await servicioGastos.modificarGasto(gastoIngresado) : await servicioGastos.registrarGasto(gastoIngresado);
@@ -175,23 +171,16 @@ const CrearEditarGasto = () => {
 						</Grid>
 
 						<Grid container spacing={2}>
+							
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-								<TextField
-									InputLabelProps={{
-										classes: {
-											root: classes.label,
-										},
-									}}
-									name="fecha"
-									variant="outlined"
-									fullWidth
-									id="fecha"
-									label="Fecha"
-									value={formik.values.fecha}
-									onChange={formik.handleChange}
-									error={formik.touched.fecha && Boolean(formik.errors.fecha)}
-									helperText={formik.touched.fecha && formik.errors.fecha}
-								/>
+								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+									<DatePicker
+										label="Fecha"
+										value={fecha}
+										onChange={(f) => setFecha(f)}
+										renderInput={(params) => <TextField {...params} />}
+									/>
+								</LocalizationProvider>
 							</Grid>
 
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
@@ -206,8 +195,10 @@ const CrearEditarGasto = () => {
 									fullWidth
 									id="costo"
 									label="Costo"
-									value={costo}
-									onChange={(c) => setCosto(c)}
+									value={formik.values.costo}
+									onChange={formik.handleChange}
+									error={formik.touched.costo && Boolean(formik.errors.costo)}
+									helperText={formik.touched.costo && formik.errors.costo}
 								/>
 							</Grid>
 						</Grid>
