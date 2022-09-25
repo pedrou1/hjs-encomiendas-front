@@ -21,7 +21,7 @@ const IniciarSesion = (prop) => {
 
 		onSubmit: async (values, e) => {
 			const res = await servicioUsuarios.iniciarSesion(values);
-			if (res.operationResult == Constantes.SUCCESS) {
+			if (res?.operationResult == Constantes.SUCCESS) {
 				res.usuario.permiso = Constantes.PERMISO_ADMINISTRADOR; // FIXME
 				authService.setLoggedIn(res.jwtToken, res.usuario);
 				window.location = '/usuarios';
@@ -34,7 +34,7 @@ const IniciarSesion = (prop) => {
 		},
 	});
 	const classes = useStyles();
-	console.log(classes.label);
+
 	return (
 		<Container component="main" maxWidth="sm">
 			<Helmet>

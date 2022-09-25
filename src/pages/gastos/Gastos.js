@@ -141,8 +141,8 @@ const cols = [
 		grow: 1,
 	},
 	{
-		name: 'Chofer',
-		selector: (row) => `${row.chofer.nombre} ${row.chofer.apellido}`,
+		name: 'Usuario',
+		selector: (row) => `${row.usuario.nombre} ${row.usuario.apellido}`,
 		sortable: true,
 		grow: 1,
 	},
@@ -154,7 +154,7 @@ const cols = [
 	},
 	{
 		name: 'Fecha',
-		selector: (row) => `${row.fecha}`,
+		selector: (row) => `${new Date(row.fecha).toLocaleDateString('es-ES', { year:"numeric", month:"numeric", day:"numeric"})}`,
 		sortable: true,
 		grow: 1,
 	},
@@ -165,4 +165,3 @@ const cols = [
 		grow: 1,
 	},
 ];
-

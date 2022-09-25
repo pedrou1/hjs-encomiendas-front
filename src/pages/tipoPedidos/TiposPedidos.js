@@ -16,6 +16,7 @@ const TiposPedidos = () => {
 	const [countTipoPedidos, setCountTipoPedidos] = useState(0);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 	const [openModal, setOpenModal] = useState(false);
+	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [tipoPedidoSeleccionado, setTipoPedidoSeleccionado] = useState({});
 	const navigate = useNavigate();
 
@@ -31,10 +32,11 @@ const TiposPedidos = () => {
 
 	const getTipoPedidos = async (newPaginationData) => {
 		if (newPaginationData) setPaginationData(newPaginationData);
-		const { tiposPedidos, totalRows } = await servicioTipoPedidos.obtenerTipoPedidos(newPaginationData || paginationData);
+		const { tiposPedidos, totalRows, operationResult } = await servicioTipoPedidos.obtenerTipoPedidos(newPaginationData || paginationData);
 		if (tiposPedidos) {
-		setTipoPedidos(tiposPedidos);
-		setCountTipoPedidos(totalRows);
+			setTipoPedidos(tiposPedidos);
+			setCountTipoPedidos(totalRows);
+			setLoadingFinished(operationResult == 1 ? true : false);
 		}
 	};
 
@@ -119,6 +121,7 @@ const TiposPedidos = () => {
 					data={tipoPedidos}
 					columns={columnas}
 					totalRows={countTipoPedidos}
+					isLoadingFinished={loadingFinished}
 					onPageChange={onPageChange}
 					onRowClicked={goToVerPedidos}
 				/>

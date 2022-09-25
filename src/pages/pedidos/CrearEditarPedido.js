@@ -208,7 +208,7 @@ const CrearEditarPedido = () => {
 								styles={customStyles}
 							/>
 
-<SelectPaginate
+							<SelectPaginate
 								label="Tipo de Pedido"
 								errorLabel="Ingrese un tipo de pedido"
 								value={tipoPedido}

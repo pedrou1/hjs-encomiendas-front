@@ -1,6 +1,6 @@
 import http from '../services/httpService';
 
-const url = process.env.REACT_APP_API_URL + 'api/gasto';
+const url = process.env.REACT_APP_API_URL + 'api/gastos';
 
 export const obtenerGastos = async (params) => {
 	try {
@@ -42,7 +42,7 @@ export const registrarGasto = async (gasto) => {
 
 export const modificarGasto = async (gasto) => {
 	try {
-		const res = await http.post(url + '/modificar', gasto);
+		const res = await http.put(url + '/modificar', gasto);
 		if (res.status == 200) {
 			return res.data;
 		}
