@@ -141,8 +141,8 @@ const cols = [
 		grow: 1,
 	},
 	{
-		name: 'Chofer',
-		selector: (row) => `${row.chofer.nombre} ${row.chofer.apellido}`,
+		name: 'Usuario',
+		selector: (row) => `${row.usuario.nombre} ${row.usuario.apellido}`,
 		sortable: true,
 		grow: 1,
 	},
@@ -165,4 +165,3 @@ const cols = [
 		grow: 1,
 	},
 ];
-

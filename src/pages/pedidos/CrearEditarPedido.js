@@ -27,7 +27,6 @@ const CrearEditarPedido = () => {
 	const [estado, setEstado] = useState(estados[0]);
 	const [tipoPedido, setTipoPedido] = useState({});
 
-
 	const navigate = useNavigate();
 	const { state } = useLocation();
 	const pedido = state?.pedido ? state.pedido : null;
@@ -49,23 +48,20 @@ const CrearEditarPedido = () => {
 	}, []);
 
 	useEffect(() => {
-		if(tipoPedido?.tarifa) setTarifa(tipoPedido.tarifa)
-	}
-	, [tipoPedido]);
+		if (tipoPedido?.tarifa) setTarifa(tipoPedido.tarifa);
+	}, [tipoPedido]);
 
 	const formik = useFormik({
 		initialValues: pedido
 			? {
 					estado: pedido.estado,
 					tamaño: pedido.tamaño,
-					tipoPedido: pedido.tipoPedido,
 					peso: pedido.peso,
 					cubicaje: pedido.cubicaje,
 			  }
 			: {
 					estado: 0,
 					tamaño: 0,
-					tipoPedido: 0,
 					peso: 0,
 					cubicaje: 0,
 			  },
@@ -73,13 +69,13 @@ const CrearEditarPedido = () => {
 
 		onSubmit: async (values, e) => {
 			try {
-				if (chofer.value && cliente.value && unidad.value) {
+				if (chofer.value && cliente.value && unidad.value && tipoPedido.value) {
 					const pedidoIngresado = {
 						...values,
 						idPedido: pedido?.idPedido,
 						idChofer: chofer.value,
 						idCliente: cliente.value,
-						tipo: tipoPedido.value,
+						idTipoPedido: tipoPedido.value,
 						idTransporte: unidad.value,
 						estado: estado.value,
 						horaLimite: !isNaN(horaLimite) ? horaLimite : null,
@@ -137,12 +133,18 @@ const CrearEditarPedido = () => {
 
 	async function loadOptionTiposPedido(search, loadedOptions) {
 		const filters = JSON.stringify(search.trim().split(/\s+/));
-		const { tiposPedido, totalRows } = await servicioTipoPedidos.obtenerTipoPedidos({ PageIndex: loadedOptions.length, PageSize: 5, filters });
-
-		return {
-			options: [...tiposPedido.map((t) => ({ value: t.idTipoPedido, label: `${t.nombre}` }))],
-			hasMore: loadedOptions.length < totalRows,
-		};
+		const { tiposPedidos, totalRows } = await servicioTipoPedidos.obtenerTipoPedidos({ PageIndex: loadedOptions.length, PageSize: 5, filters });
+		if (tiposPedidos?.length > 0) {
+			return {
+				options: [...tiposPedidos.map((t) => ({ value: t.idTipoPedido, label: `${t.nombre}` }))],
+				hasMore: false,
+			};
+		} else {
+			return {
+				options: [],
+				hasMore: false,
+			};
+		}
 	}
 
 	const customStyles = {
@@ -188,6 +190,7 @@ const CrearEditarPedido = () => {
 								value={cliente}
 								loadOptions={loadOptionsCliente}
 								setOnChange={setCliente}
+								styleInputLabel={{ mt: 2 }}
 							/>
 
 							<SelectPaginate
@@ -199,6 +202,15 @@ const CrearEditarPedido = () => {
 								styleInputLabel={{ mt: 2 }}
 							/>
 
+							<SelectPaginate
+								label="Tipo de Pedido"
+								errorLabel="Ingrese un tipo de pedido"
+								value={tipoPedido}
+								loadOptions={loadOptionTiposPedido}
+								setOnChange={(e) => setTipoPedido(e)}
+								styleInputLabel={{ mt: 2 }}
+							/>
+
 							<InputLabel sx={{ mt: 2 }}>Estado</InputLabel>
 							<Select
 								menuPortalTarget={document.querySelector('body')}
@@ -206,14 +218,6 @@ const CrearEditarPedido = () => {
 								options={estados}
 								onChange={(e) => setEstado(e)}
 								styles={customStyles}
-							/>
-
-<SelectPaginate
-								label="Tipo de Pedido"
-								errorLabel="Ingrese un tipo de pedido"
-								value={tipoPedido}
-								loadOptions={loadOptionTiposPedido}
-								setOnChange={(e) => setTipoPedido(e)}
 							/>
 
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
@@ -317,5 +321,5 @@ export default CrearEditarPedido;
 const estados = [
 	{ label: 'Pendiente', value: 1 },
 	{ label: 'En Curso', value: 2 },
-	{ label: 'Finalizado', value: 3},
+	{ label: 'Finalizado', value: 3 },
 ];

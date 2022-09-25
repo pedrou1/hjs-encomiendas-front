@@ -21,7 +21,7 @@ import SelectPaginate from '../../components/SelectPaginate';
 import * as servicioTipoPedidos from '../../services/ServicioTipoPedidos';
 
 const CrearEditarGasto = () => {
-	const [chofer, setChofer] = useState({});
+	const [usuario, setUsuario] = useState({});
 	const [unidad, setUnidad] = useState({});
 
 	const navigate = useNavigate();
@@ -31,18 +31,17 @@ const CrearEditarGasto = () => {
 
 	useEffect(() => {
 		if (gasto) {
-			const chofer = { value: gasto.chofer.idUsuario, label: `${gasto.chofer.nombre} ${gasto.chofer.apellido}` };
+			const usuario = { value: gasto.usuario.idUsuario, label: `${gasto.usuario.nombre} ${gasto.usuario.apellido}` };
 			const unidad = { value: gasto.transporte.idUnidadTransporte, label: `${gasto.transporte.nombre}` };
-			setChofer(chofer);
+			setUsuario(usuario);
 			setUnidad(unidad);
-            setCosto(costo);
+			setCosto(costo);
 		}
 	}, []);
 
 	useEffect(() => {
-		if(gasto?.costo) setCosto(gasto.costo)
-	}
-	, [gasto]);
+		if (gasto?.costo) setCosto(gasto.costo);
+	}, [gasto]);
 
 	const formik = useFormik({
 		initialValues: gasto
@@ -60,11 +59,11 @@ const CrearEditarGasto = () => {
 
 		onSubmit: async (values, e) => {
 			try {
-				if (chofer.value && unidad.value) {
+				if (usuario.value && unidad.value) {
 					const gastoIngresado = {
 						...values,
 						idGasto: gasto?.idGasto,
-						idChofer: chofer.value,
+						idUsuario: usuario.value,
 						idTransporte: unidad.value,
 					};
 
@@ -86,7 +85,7 @@ const CrearEditarGasto = () => {
 
 	const classes = useStyles();
 
-	async function loadOptionsChofer(search, loadedOptions) {
+	async function loadOptionsUsuario(search, loadedOptions) {
 		const filters = JSON.stringify(search.trim().split(/\s+/));
 
 		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters });
@@ -135,7 +134,6 @@ const CrearEditarGasto = () => {
 						{gasto ? 'Editar Gasto' : 'Crear Gasto'}
 					</Typography>
 					<Box component="form" noValidate onSubmit={formik.handleSubmit} sx={{ mt: 3 }}>
-						
 						<Grid item xs={12} sm={6}>
 							<TextField
 								InputLabelProps={{
@@ -157,11 +155,11 @@ const CrearEditarGasto = () => {
 
 						<Grid className="text-start">
 							<SelectPaginate
-								label="Chofer"
-								errorLabel="Ingrese un chofer"
-								value={chofer}
-								loadOptions={loadOptionsChofer}
-								setOnChange={setChofer}
+								label="Usuario"
+								errorLabel="Ingrese un usuario"
+								value={usuario}
+								loadOptions={loadOptionsUsuario}
+								setOnChange={setUsuario}
 							/>
 
 							<SelectPaginate
@@ -244,8 +242,10 @@ const useStyles = () => ({
 });
 
 const validationSchema = yup.object({
-	
-	descripcion: yup.string('Introduce la descripción').min(4, 'La descripción debe tener una longitud mínima de 100 caracteres').required('Introduce la descripción'),
+	descripcion: yup
+		.string('Introduce la descripción')
+		.min(4, 'La descripción debe tener una longitud mínima de 100 caracteres')
+		.required('Introduce la descripción'),
 	costo: yup.number('Introduce el costo').min(0).required('Introduce el costo'),
 });
 
