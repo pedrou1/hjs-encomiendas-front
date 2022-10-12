@@ -3,16 +3,28 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Helmet } from 'react-helmet';
 import * as servicioUnidades from '../../services/ServicioUnidades';
+import * as servicioUsuarios from '../../services/ServicioUsuarios';
 import * as Constantes from '../../utils/constantes';
 import { defaultStyles } from '../../utils/defaultStyles';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
+import SelectPaginate from '../../components/SelectPaginate';
 
 const CrearEditarUnidad = () => {
 	const navigate = useNavigate();
 	const { state } = useLocation();
+	const [chofer, setChofer] = useState({});
+	const [errors, setErrors] = useState({});
 	const unidad = state?.unidad ? state.unidad : null;
+
+	useEffect(() => {
+		if (unidad) {
+			const chofer = { value: unidad.chofer.idUsuario, label: `${unidad.chofer.nombre} ${unidad.chofer.apellido}` };
+			setChofer(chofer);
+		}
+	}, []);
 
 	const formik = useFormik({
 		initialValues: unidad
@@ -30,22 +42,44 @@ const CrearEditarUnidad = () => {
 
 		onSubmit: async (values, e) => {
 			try {
-				const unidadIngresada = { ...values, idUnidadTransporte: unidad?.idUnidadTransporte };
+				checkErrors();
+				if (chofer.value) {
+					const unidadIngresada = { ...values, idChofer: chofer.value, idUnidadTransporte: unidad?.idUnidadTransporte };
 
-				const res = unidad ? await servicioUnidades.modificarUnidad(unidadIngresada) : await servicioUnidades.registrarUnidad(unidadIngresada);
+					const res = unidad ? await servicioUnidades.modificarUnidad(unidadIngresada) : await servicioUnidades.registrarUnidad(unidadIngresada);
 
-				if (res.operationResult == Constantes.SUCCESS) {
-					navigate('/unidades');
-					toast.success(`Unidad ${unidad ? 'modificada' : 'creada'} correctamente`);
-				} else if (res.operationResult == Constantes.ERROR) {
-					toast.error('Ha ocurrido un error');
-					navigate('/error');
+					if (res.operationResult == Constantes.SUCCESS) {
+						navigate('/unidades');
+						toast.success(`Unidad ${unidad ? 'modificada' : 'creada'} correctamente`);
+					} else if (res.operationResult == Constantes.ERROR) {
+						toast.error('Ha ocurrido un error');
+						navigate('/error');
+					}
+				} else {
+					toast.error('Ingrese los datos');
 				}
 			} catch (error) {}
 		},
 	});
 
 	const classes = useStyles();
+
+	async function loadOptionsChofer(search, loadedOptions) {
+		const filters = JSON.stringify(search.trim().split(/\s+/));
+		const Tipo = Constantes.ID_CHOFER;
+		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters, Tipo });
+
+		return {
+			options: [...usuarios.map((u) => ({ value: u.idUsuario, label: `${u.nombre} ${u.apellido}` }))],
+			hasMore: loadedOptions.length < totalRows,
+		};
+	}
+
+	const checkErrors = () => {
+		setErrors({
+			chofer: !chofer?.value ? true : false,
+		});
+	};
 
 	return (
 		<Container component="main" maxWidth="sm">
@@ -128,6 +162,15 @@ const CrearEditarUnidad = () => {
 									onChange={formik.handleChange}
 									error={formik.touched.capacidad && Boolean(formik.errors.capacidad)}
 									helperText={formik.touched.capacidad && formik.errors.capacidad}
+								/>
+							</Grid>
+							<Grid className="text-start" item xs={12} sm={8}>
+								<SelectPaginate
+									label="Chofer"
+									errorLabel={errors.chofer ? 'Ingrese un chofer' : ''}
+									value={chofer}
+									loadOptions={loadOptionsChofer}
+									setOnChange={setChofer}
 								/>
 							</Grid>
 						</Grid>

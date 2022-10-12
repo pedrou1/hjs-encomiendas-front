@@ -20,7 +20,7 @@ const RegistrarUsuario = () => {
 		validationSchema: validationSchema,
 
 		onSubmit: async (values, e) => {
-			const val = { ...values, categoriaUsuario: { idCategoria: 1 } };
+			const val = { ...values, categoriaUsuario: { idCategoria: Constantes.ID_ADMINISTRADOR } };
 			const res = await servicioUsuarios.registrarUsuario(val);
 
 			if (res == Constantes.SUCCESS) {

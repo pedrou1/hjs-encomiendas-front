@@ -5,7 +5,7 @@ export const INVALIDUSER = 3;
 
 export const USUARIO = 'usuario';
 
-export const PERMISO_ADMINISTRADOR = 1;
+export const PERMISO_ADMINISTRADOR = 3;
 export const PERMISO_CHOFER = 2;
 
 export const ID_CLIENTE = 1;

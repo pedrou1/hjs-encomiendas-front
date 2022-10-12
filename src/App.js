@@ -41,7 +41,7 @@ function App() {
 		<div className="App">
 			<Box sx={{ display: 'flex' }}>
 				<NavBar usuario={usuario} />
-				{usuario?.idCategoria == Constantes.PERMISO_ADMINISTRADOR ? <Sidebar /> : <></>}
+				{usuario?.permiso == Constantes.PERMISO_ADMINISTRADOR ? <Sidebar /> : <></>}
 				<Routes>
 					<Route path="/" element={<Navigate replace to="/iniciar-sesion" />} />
 					<Route path="/registrar" exact element={<RegistrarUsuario />} />
@@ -122,7 +122,7 @@ function App() {
 							</ProtectedRoute>
 						}
 					/>
-					
+
 					<Route
 						path="/crear-editar-pedido"
 						exact

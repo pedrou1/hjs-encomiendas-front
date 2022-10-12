@@ -23,6 +23,7 @@ import * as servicioTipoPedidos from '../../services/ServicioTipoPedidos';
 const CrearEditarGasto = () => {
 	const [usuario, setUsuario] = useState({});
 	const [unidad, setUnidad] = useState({});
+	const [errors, setErrors] = useState({});
 
 	const navigate = useNavigate();
 	const { state } = useLocation();
@@ -35,11 +36,15 @@ const CrearEditarGasto = () => {
 			const unidad = { value: gasto.transporte.idUnidadTransporte, label: `${gasto.transporte.nombre}` };
 			setUsuario(usuario);
 			setUnidad(unidad);
-            
 		}
 	}, []);
 
-
+	const checkErrors = () => {
+		setErrors({
+			usuario: !usuario?.value ? true : false,
+			unidad: !unidad?.value ? true : false,
+		});
+	};
 
 	const formik = useFormik({
 		initialValues: gasto
@@ -55,6 +60,7 @@ const CrearEditarGasto = () => {
 
 		onSubmit: async (values, e) => {
 			try {
+				checkErrors();
 				if (usuario.value && unidad.value) {
 					const gastoIngresado = {
 						...values,
@@ -153,7 +159,7 @@ const CrearEditarGasto = () => {
 						<Grid className="text-start">
 							<SelectPaginate
 								label="Usuario"
-								errorLabel="Ingrese un usuario"
+								errorLabel={errors.usuario ? 'Ingrese un usuario' : ''}
 								value={usuario}
 								loadOptions={loadOptionsUsuario}
 								setOnChange={setUsuario}
@@ -161,7 +167,7 @@ const CrearEditarGasto = () => {
 
 							<SelectPaginate
 								label="Unidad de transporte"
-								errorLabel="Ingrese una unidad"
+								errorLabel={errors.unidad ? 'Ingrese una unidad' : ''}
 								value={unidad}
 								loadOptions={loadOptionsUnidad}
 								setOnChange={setUnidad}
@@ -170,15 +176,9 @@ const CrearEditarGasto = () => {
 						</Grid>
 
 						<Grid container spacing={2}>
-							
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
 								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
-									<DatePicker
-										label="Fecha"
-										value={fecha}
-										onChange={(f) => setFecha(f)}
-										renderInput={(params) => <TextField {...params} />}
-									/>
+									<DatePicker label="Fecha" value={fecha} onChange={(f) => setFecha(f)} renderInput={(params) => <TextField {...params} />} />
 								</LocalizationProvider>
 							</Grid>
 

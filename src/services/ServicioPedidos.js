@@ -20,6 +20,15 @@ export const obtenerPedido = async (idPedido) => {
 	} catch (err) {}
 };
 
+export const obtenerCantidadPedidosPorMes = async () => {
+	try {
+		const res = await http.get(`${url}/por-mes`);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
 export const eliminarPedido = async (idPedido) => {
 	try {
 		console.log(idPedido);
@@ -43,6 +52,15 @@ export const registrarPedido = async (pedido) => {
 export const modificarPedido = async (pedido) => {
 	try {
 		const res = await http.post(url + '/modificar', pedido);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
+export const optimizarRuta = async (listaDirecciones) => {
+	try {
+		const res = await http.post(url + '/optimizacion', listaDirecciones);
 		if (res.status == 200) {
 			return res.data;
 		}

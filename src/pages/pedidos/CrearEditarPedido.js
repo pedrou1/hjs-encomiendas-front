@@ -26,6 +26,7 @@ const CrearEditarPedido = () => {
 	const [unidad, setUnidad] = useState({});
 	const [estado, setEstado] = useState(estados[0]);
 	const [tipoPedido, setTipoPedido] = useState({});
+	const [errors, setErrors] = useState({});
 
 	const navigate = useNavigate();
 	const { state } = useLocation();
@@ -45,11 +46,27 @@ const CrearEditarPedido = () => {
 			setUnidad(unidad);
 			setTipoPedido(tipoPedido);
 		}
+		obtenertest(pedido);
 	}, []);
+
+	const obtenertest = async (pedido) => {
+		const adresses = 'Tres Cruces Shopping, Bulevar General Artigas, Montevideo Departamento de Montevideo, Uruguay';
+		console.log('adresses', adresses);
+		const operationResult = await servicioPedidos.optimizarRuta(['-33.872271, -57.3711493', adresses]);
+	};
 
 	useEffect(() => {
 		if (tipoPedido?.tarifa) setTarifa(tipoPedido.tarifa);
 	}, [tipoPedido]);
+
+	const checkErrors = () => {
+		setErrors({
+			chofer: !chofer?.value ? true : false,
+			cliente: !cliente?.value ? true : false,
+			unidad: !unidad?.value ? true : false,
+			tipoPedido: !tipoPedido?.value ? true : false,
+		});
+	};
 
 	const formik = useFormik({
 		initialValues: pedido
@@ -69,6 +86,7 @@ const CrearEditarPedido = () => {
 
 		onSubmit: async (values, e) => {
 			try {
+				checkErrors();
 				if (chofer.value && cliente.value && unidad.value && tipoPedido.value) {
 					const pedidoIngresado = {
 						...values,
@@ -101,8 +119,8 @@ const CrearEditarPedido = () => {
 
 	async function loadOptionsChofer(search, loadedOptions) {
 		const filters = JSON.stringify(search.trim().split(/\s+/));
-
-		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters });
+		const Tipo = Constantes.ID_CHOFER;
+		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters, Tipo });
 
 		return {
 			options: [...usuarios.map((u) => ({ value: u.idUsuario, label: `${u.nombre} ${u.apellido}` }))],
@@ -112,8 +130,8 @@ const CrearEditarPedido = () => {
 
 	async function loadOptionsCliente(search, loadedOptions) {
 		const filters = JSON.stringify(search.trim().split(/\s+/));
-
-		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters });
+		const Tipo = Constantes.ID_CLIENTE;
+		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters, Tipo });
 
 		return {
 			options: [...usuarios.map((u) => ({ value: u.idUsuario, label: `${u.nombre} ${u.apellido}` }))],
@@ -178,7 +196,7 @@ const CrearEditarPedido = () => {
 						<Grid className="text-start">
 							<SelectPaginate
 								label="Chofer"
-								errorLabel="Ingrese un chofer"
+								errorLabel={errors.chofer ? 'Ingrese un chofer' : ''}
 								value={chofer}
 								loadOptions={loadOptionsChofer}
 								setOnChange={setChofer}
@@ -186,7 +204,7 @@ const CrearEditarPedido = () => {
 
 							<SelectPaginate
 								label="Cliente"
-								errorLabel="Ingrese un cliente"
+								errorLabel={errors.cliente ? 'Ingrese un cliente' : ''}
 								value={cliente}
 								loadOptions={loadOptionsCliente}
 								setOnChange={setCliente}
@@ -195,7 +213,7 @@ const CrearEditarPedido = () => {
 
 							<SelectPaginate
 								label="Unidad de transporte"
-								errorLabel="Ingrese una unidad"
+								errorLabel={errors.unidad ? 'Ingrese una unidad' : ''}
 								value={unidad}
 								loadOptions={loadOptionsUnidad}
 								setOnChange={setUnidad}
@@ -204,7 +222,7 @@ const CrearEditarPedido = () => {
 
 							<SelectPaginate
 								label="Tipo de Pedido"
-								errorLabel="Ingrese un tipo de pedido"
+								errorLabel={errors.tipoPedido ? 'Ingrese un tipo de pedido' : ''}
 								value={tipoPedido}
 								loadOptions={loadOptionTiposPedido}
 								setOnChange={(e) => setTipoPedido(e)}

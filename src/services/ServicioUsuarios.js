@@ -21,6 +21,15 @@ export const obtenerUsuario = async (idUsuario) => {
 	} catch (err) {}
 };
 
+export const obtenerCantidadClientesPorMes = async () => {
+	try {
+		const res = await http.get(`${url}/por-mes`);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
 export const eliminarUsuario = async (idUsuario) => {
 	try {
 		const res = await http.delete(`${url}/${idUsuario}`);

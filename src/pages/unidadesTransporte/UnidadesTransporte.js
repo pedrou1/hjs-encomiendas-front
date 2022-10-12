@@ -140,6 +140,12 @@ const cols = [
 		grow: 1,
 	},
 	{
+		name: 'Chofer',
+		selector: (row) => `${row.chofer.nombre} ${row.chofer.apellido}`,
+		sortable: true,
+		grow: 1,
+	},
+	{
 		name: 'Promedio de consumo',
 		selector: (row) => row.promedioConsumo,
 		sortable: true,
