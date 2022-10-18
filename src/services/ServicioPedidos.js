@@ -58,11 +58,4 @@ export const modificarPedido = async (pedido) => {
 	} catch (err) {}
 };
 
-export const optimizarRuta = async (listaDirecciones) => {
-	try {
-		const res = await http.post(url + '/optimizacion', listaDirecciones);
-		if (res.status == 200) {
-			return res.data;
-		}
-	} catch (err) {}
-};
+

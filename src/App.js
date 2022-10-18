@@ -27,6 +27,7 @@ import CrearEditarTipoPedido from './pages/tipoPedidos/CrearEditarTipoPedido';
 import TiposPedidos from './pages/tipoPedidos/TiposPedidos';
 import Gastos from './pages/gastos/Gastos';
 import CrearEditarGasto from './pages/gastos/CrearEditarGasto';
+import CambiarContrasenia from './pages/usuarios/CambiarContrasenia';
 
 function App() {
 	const [usuario, setUsuario] = useState(null);
@@ -51,7 +52,7 @@ function App() {
 						path="/usuarios"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<Usuarios />
 							</ProtectedRoute>
 						}
@@ -60,7 +61,7 @@ function App() {
 						path="/crear-usuario"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<CrearEditarUsuario />
 							</ProtectedRoute>
 						}
@@ -69,8 +70,18 @@ function App() {
 						path="/usuario/:idUsuario"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR, Constantes.PERMISO_CHOFER]}>
 								<VerUsuario />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/usuario/cambiar-password"
+						exact
+						element={
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
+								<CambiarContrasenia />
 							</ProtectedRoute>
 						}
 					/>
@@ -78,7 +89,7 @@ function App() {
 						path="/unidades"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<UnidadesTransporte />
 							</ProtectedRoute>
 						}
@@ -87,7 +98,7 @@ function App() {
 						path="/crear-unidad"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<CrearEditarUnidad />
 							</ProtectedRoute>
 						}
@@ -97,7 +108,7 @@ function App() {
 						path="/pedidos"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<Pedidos />
 							</ProtectedRoute>
 						}
@@ -107,7 +118,7 @@ function App() {
 						path="/crear-pedido"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<CrearEditarPedido />
 							</ProtectedRoute>
 						}
@@ -117,7 +128,7 @@ function App() {
 						path="/estadisticas"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<Estadisticas />
 							</ProtectedRoute>
 						}
@@ -127,7 +138,7 @@ function App() {
 						path="/crear-editar-pedido"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<CrearEditarTipoPedido />
 							</ProtectedRoute>
 						}
@@ -137,7 +148,7 @@ function App() {
 						path="/tipos-pedidos"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<TiposPedidos />
 							</ProtectedRoute>
 						}
@@ -147,7 +158,7 @@ function App() {
 						path="/gastos"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<Gastos />
 							</ProtectedRoute>
 						}
@@ -157,7 +168,7 @@ function App() {
 						path="/crear-editar-gasto"
 						exact
 						element={
-							<ProtectedRoute permiso={Constantes.PERMISO_ADMINISTRADOR}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<CrearEditarGasto />
 							</ProtectedRoute>
 						}

@@ -12,6 +12,8 @@ function SelectPaginate({ label, value, loadOptions, setOnChange, errorLabel, st
 					setOnChange(c);
 				}}
 				menuPortalTarget={document.querySelector('body')}
+				loadingMessage={() => 'Cargando...'}
+				noOptionsMessage={() => 'No se ha encontrado datos' }
 			/>
 			<FormHelperText
 				error={Boolean(true)}

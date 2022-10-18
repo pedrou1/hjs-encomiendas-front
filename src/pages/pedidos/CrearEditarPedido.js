@@ -19,6 +19,8 @@ import { AsyncPaginate } from 'react-select-async-paginate';
 import Select from 'react-select';
 import SelectPaginate from '../../components/SelectPaginate';
 import * as servicioTipoPedidos from '../../services/ServicioTipoPedidos';
+import GoogleApiWrapper from './MapComp';
+import GooglePlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-google-places-autocomplete';
 
 const CrearEditarPedido = () => {
 	const [chofer, setChofer] = useState({});
@@ -46,14 +48,7 @@ const CrearEditarPedido = () => {
 			setUnidad(unidad);
 			setTipoPedido(tipoPedido);
 		}
-		obtenertest(pedido);
 	}, []);
-
-	const obtenertest = async (pedido) => {
-		const adresses = 'Tres Cruces Shopping, Bulevar General Artigas, Montevideo Departamento de Montevideo, Uruguay';
-		console.log('adresses', adresses);
-		const operationResult = await servicioPedidos.optimizarRuta(['-33.872271, -57.3711493', adresses]);
-	};
 
 	useEffect(() => {
 		if (tipoPedido?.tarifa) setTarifa(tipoPedido.tarifa);
@@ -65,6 +60,7 @@ const CrearEditarPedido = () => {
 			cliente: !cliente?.value ? true : false,
 			unidad: !unidad?.value ? true : false,
 			tipoPedido: !tipoPedido?.value ? true : false,
+			direccion: !direccion?.lat ? true : false,
 		});
 	};
 
@@ -75,19 +71,25 @@ const CrearEditarPedido = () => {
 					tamaño: pedido.tamaño,
 					peso: pedido.peso,
 					cubicaje: pedido.cubicaje,
+					apartamento: pedido.apartamento,
+					descripcion: pedido.descripcion,
+					nroPuerta: pedido.nroPuerta,
 			  }
 			: {
 					estado: 0,
 					tamaño: 0,
 					peso: 0,
 					cubicaje: 0,
+					apartamento: '',
+					descripcion: '',
+					nroPuerta: '',
 			  },
 		validationSchema: validationSchema,
 
 		onSubmit: async (values, e) => {
 			try {
 				checkErrors();
-				if (chofer.value && cliente.value && unidad.value && tipoPedido.value) {
+				if (chofer.value && cliente.value && unidad.value && tipoPedido.value && direccion.lat) {
 					const pedidoIngresado = {
 						...values,
 						idPedido: pedido?.idPedido,
@@ -96,6 +98,10 @@ const CrearEditarPedido = () => {
 						idTipoPedido: tipoPedido.value,
 						idTransporte: unidad.value,
 						estado: estado.value,
+						longitude: direccion.lng,
+						latitude: direccion.lat,
+						nombreDireccion: direccion.value.description,
+						//setDireccion({ lat, lng, nombre: direccion.value.description });
 						horaLimite: !isNaN(horaLimite) ? horaLimite : null,
 					};
 
@@ -175,6 +181,30 @@ const CrearEditarPedido = () => {
 		},
 	};
 
+	const [direccion, setDireccion] = useState(null);
+
+	const [showMap, setShowMap] = useState(false);
+
+	useEffect(() => {
+		const time = setTimeout(() => {
+			setShowMap(true);
+		}, 500);
+
+		return () => {
+			clearTimeout(time);
+		};
+	});
+
+	useEffect(() => {
+		if (direccion?.value) {
+			geocodeByAddress(direccion.value.description)
+				.then((results) => getLatLng(results[0]))
+				.then(({ lat, lng }) => {
+					setDireccion({ lat, lng, nombre: direccion.value.description });
+				});
+		}
+	}, [direccion]);
+
 	return (
 		<Container component="main" maxWidth="sm">
 			<Helmet>
@@ -201,7 +231,6 @@ const CrearEditarPedido = () => {
 								loadOptions={loadOptionsChofer}
 								setOnChange={setChofer}
 							/>
-
 							<SelectPaginate
 								label="Cliente"
 								errorLabel={errors.cliente ? 'Ingrese un cliente' : ''}
@@ -210,7 +239,6 @@ const CrearEditarPedido = () => {
 								setOnChange={setCliente}
 								styleInputLabel={{ mt: 2 }}
 							/>
-
 							<SelectPaginate
 								label="Unidad de transporte"
 								errorLabel={errors.unidad ? 'Ingrese una unidad' : ''}
@@ -219,7 +247,6 @@ const CrearEditarPedido = () => {
 								setOnChange={setUnidad}
 								styleInputLabel={{ mt: 2 }}
 							/>
-
 							<SelectPaginate
 								label="Tipo de Pedido"
 								errorLabel={errors.tipoPedido ? 'Ingrese un tipo de pedido' : ''}
@@ -228,7 +255,6 @@ const CrearEditarPedido = () => {
 								setOnChange={(e) => setTipoPedido(e)}
 								styleInputLabel={{ mt: 2 }}
 							/>
-
 							<InputLabel sx={{ mt: 2 }}>Estado</InputLabel>
 							<Select
 								menuPortalTarget={document.querySelector('body')}
@@ -237,7 +263,44 @@ const CrearEditarPedido = () => {
 								onChange={(e) => setEstado(e)}
 								styles={customStyles}
 							/>
-
+							<InputLabel sx={{ mt: 2 }}>Direccion</InputLabel>
+							<GooglePlacesAutocomplete
+								apiKey="AIzaSyDLnUEBnSjB2M-D1JRde3FYfGL6_awhTJE"
+								apiOptions={{ language: 'es' }}
+								autocompletionRequest={{ componentRestrictions: { country: 'uy' } }}
+								selectProps={{
+									direccion,
+									onChange: setDireccion,
+									// onChange: setData, //save the value gotten from google
+									placeholder: 'Busca una dirección',
+									noOptionsMessage: () => (direccion ? 'No se ha encontrado una direccion' : 'Ingrese un dato'),
+									loadingMessage: () => 'Cargando...',
+									// styles: {
+									// zIndex: 9999,
+									//   input: (provided) => ({
+									// 	...provided,
+									// 	zIndex: 9999,
+									//   }),
+									//   option: (provided) => ({
+									// 	...provided,
+									// 	zIndex: 9999,
+									//   }),
+									//   singleValue: (provided) => ({
+									// 	zIndex: 9999,
+									// 	color: "#222222"
+									//   })
+									// }
+								}}
+								onLoadFailed={(error) => {
+									console.log(error);
+								}}
+							/>
+							{errors.direccion && (
+								<InputLabel sx={{ mt: '0.3rem', color: '#d32f2f', fontSize: '0.75rem', ml: 1 }}>Ingrese una direccion</InputLabel>
+							)}
+							<Grid item xs={12} sm={6} style={{ height: 280, marginTop: 20, position: 'relative', width: 350 }}>
+								{showMap && <GoogleApiWrapper markerPos={direccion}></GoogleApiWrapper>}
+							</Grid>
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
 								<TextField
 									className="text-start"
@@ -293,6 +356,62 @@ const CrearEditarPedido = () => {
 									label="Tarifa"
 									value={tarifa}
 									onChange={(t) => setTarifa(t)}
+								/>
+							</Grid>
+							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="apartamento"
+									variant="outlined"
+									fullWidth
+									id="apartamento"
+									label="Apartamento"
+									value={formik.values.apartamento}
+									onChange={formik.handleChange}
+									error={formik.touched.apartamento && Boolean(formik.errors.apartamento)}
+									helperText={formik.touched.apartamento && formik.errors.apartamento}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="descripcion"
+									variant="outlined"
+									fullWidth
+									id="descripcion"
+									label="Descripcion"
+									value={formik.values.descripcion}
+									onChange={formik.handleChange}
+									error={formik.touched.descripcion && Boolean(formik.errors.descripcion)}
+									helperText={formik.touched.descripcion && formik.errors.descripcion}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="nroPuerta"
+									variant="outlined"
+									fullWidth
+									id="nroPuerta"
+									label="Nro. Puerta"
+									value={formik.values.nroPuerta}
+									onChange={formik.handleChange}
+									error={formik.touched.nroPuerta && Boolean(formik.errors.nroPuerta)}
+									helperText={formik.touched.nroPuerta && formik.errors.nroPuerta}
 								/>
 							</Grid>
 						</Grid>

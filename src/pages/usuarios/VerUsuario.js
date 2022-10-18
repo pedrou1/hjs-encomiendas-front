@@ -18,6 +18,7 @@ import ModalDialog from '../../components/ModalDialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as servicioPedidos from '../../services/ServicioPedidos';
+import KeyIcon from '@mui/icons-material/Key';
 
 const VerUsuario = () => {
 	const [usuario, setUsuario] = useState({});
@@ -85,6 +86,9 @@ const VerUsuario = () => {
 				<div>
 					<Grid item xs={3} lg={3} className="d-flex flex-column">
 						<div className="align-self-end">
+						<Button variant="outlined" sx={{ mr: 1 }} startIcon={<KeyIcon />} onClick={() => navigate('/usuario/cambiar-password', { state: {  usuario } })}>
+								Cambiar contraseña
+							</Button>
 							<Button
 								variant="outlined"
 								sx={{ mr: 1 }}

@@ -57,6 +57,15 @@ export const modificarUsuario = async (usuario) => {
 	} catch (err) {}
 };
 
+export const modificarContraUsuario = async (usuario) => {
+	try {
+		const res = await http.put(url + '/modificar-contrasenia', usuario);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
 export const iniciarSesion = async (usuario) => {
 	try {
 		const res = await axios.post(url + '/login', usuario);
