@@ -5,8 +5,12 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Helmet } from 'react-helmet';
 import * as servicioUsuarios from '../../services/ServicioUsuarios';
 import * as Constantes from '../../utils/constantes';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const RegistrarUsuario = () => {
+	const navigate = useNavigate();
+
 	const formik = useFormik({
 		initialValues: {
 			nombre: '',
@@ -20,15 +24,16 @@ const RegistrarUsuario = () => {
 		validationSchema: validationSchema,
 
 		onSubmit: async (values, e) => {
-			const val = { ...values, categoriaUsuario: { idCategoria: Constantes.ID_ADMINISTRADOR } };
+			const val = { ...values, categoriaUsuario: { idCategoria: Constantes.ID_ADMINISTRADOR } }; //FIXME: cambiar a cliente
 			const res = await servicioUsuarios.registrarUsuario(val);
 
-			if (res == Constantes.SUCCESS) {
-				console.log('success');
-			} else if (res == Constantes.ALREADYEXIST) {
+			if (res.operationResult == Constantes.SUCCESS) {
+				navigate('/iniciar-sesion');
+				toast.success(`Registrado correctamente`);
+			} else if (res.operationResult == Constantes.ALREADYEXIST) {
 				e.setFieldError('usuario', 'El usuario ya existe, ingresa otro');
-			} else if (res == Constantes.ERROR) {
-				// 			navigate('/404');
+			} else if (res.operationResult == Constantes.ERROR) {
+				window.location = '/error';
 			}
 		},
 	});

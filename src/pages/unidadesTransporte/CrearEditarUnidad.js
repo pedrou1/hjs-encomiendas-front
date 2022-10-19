@@ -32,11 +32,21 @@ const CrearEditarUnidad = () => {
 					nombre: unidad.nombre,
 					promedioConsumo: unidad.promedioConsumo,
 					capacidad: unidad.capacidad ? unidad.capacidad : 0,
+					marca: unidad.marca ? unidad.marca : '',
+					modelo: unidad.modelo ? unidad.modelo : '',
+					anio: unidad.anio ? unidad.anio : 0,
+					padron: unidad.padron ? unidad.padron : '',
+					matricula: unidad.matricula ? unidad.matricula : '',
 			  }
 			: {
 					nombre: '',
 					promedioConsumo: 0,
 					capacidad: 0,
+					marca: '',
+					modelo: '',
+					anio: 0,
+					padron: '',
+					matricula: '',
 			  },
 		validationSchema: validationSchema,
 
@@ -47,7 +57,7 @@ const CrearEditarUnidad = () => {
 					const unidadIngresada = { ...values, idChofer: chofer.value, idUnidadTransporte: unidad?.idUnidadTransporte };
 
 					const res = unidad ? await servicioUnidades.modificarUnidad(unidadIngresada) : await servicioUnidades.registrarUnidad(unidadIngresada);
-
+					console.log(res);
 					if (res.operationResult == Constantes.SUCCESS) {
 						navigate('/unidades');
 						toast.success(`Unidad ${unidad ? 'modificada' : 'creada'} correctamente`);
@@ -58,7 +68,9 @@ const CrearEditarUnidad = () => {
 				} else {
 					toast.error('Ingrese los datos');
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.log(error);
+			}
 		},
 	});
 
@@ -134,6 +146,11 @@ const CrearEditarUnidad = () => {
 										},
 									}}
 									type="number"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
 									name="promedioConsumo"
 									variant="outlined"
 									fullWidth
@@ -155,6 +172,12 @@ const CrearEditarUnidad = () => {
 									}}
 									name="capacidad"
 									variant="outlined"
+									type="number"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
 									fullWidth
 									id="capacidad"
 									label="Capacidad"
@@ -164,6 +187,112 @@ const CrearEditarUnidad = () => {
 									helperText={formik.touched.capacidad && formik.errors.capacidad}
 								/>
 							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="marca"
+									variant="outlined"
+									fullWidth
+									id="marca"
+									label="Marca"
+									autoFocus
+									value={formik.values.marca}
+									onChange={formik.handleChange}
+									error={formik.touched.marca && Boolean(formik.errors.marca)}
+									helperText={formik.touched.marca && formik.errors.marca}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="modelo"
+									variant="outlined"
+									fullWidth
+									id="modelo"
+									label="Modelo"
+									autoFocus
+									value={formik.values.modelo}
+									onChange={formik.handleChange}
+									error={formik.touched.modelo && Boolean(formik.errors.modelo)}
+									helperText={formik.touched.modelo && formik.errors.modelo}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="anio"
+									variant="outlined"
+									type="number"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
+									fullWidth
+									id="anio"
+									label="Año"
+									value={formik.values.anio}
+									onChange={formik.handleChange}
+									error={formik.touched.anio && Boolean(formik.errors.anio)}
+									helperText={formik.touched.anio && formik.errors.anio}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="padron"
+									variant="outlined"
+									fullWidth
+									id="padron"
+									label="Padron"
+									autoFocus
+									value={formik.values.padron}
+									onChange={formik.handleChange}
+									error={formik.touched.padron && Boolean(formik.errors.padron)}
+									helperText={formik.touched.padron && formik.errors.padron}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="matricula"
+									variant="outlined"
+									fullWidth
+									id="matricula"
+									label="Matricula"
+									autoFocus
+									value={formik.values.matricula}
+									onChange={formik.handleChange}
+									error={formik.touched.matricula && Boolean(formik.errors.matricula)}
+									helperText={formik.touched.matricula && formik.errors.matricula}
+								/>
+							</Grid>
+
 							<Grid className="text-start" item xs={12} sm={8}>
 								<SelectPaginate
 									label="Chofer"

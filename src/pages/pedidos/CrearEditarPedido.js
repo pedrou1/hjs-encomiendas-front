@@ -1,4 +1,4 @@
-import { Button, TextField, CssBaseline, Box, Grid, Typography, Container, Paper, InputLabel, MenuItem, FormHelperText } from '@mui/material';
+import { Button, TextField, CssBaseline, Box, Grid, Typography, Container, Paper, InputLabel, Chip, FormHelperText } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Helmet } from 'react-helmet';
@@ -22,6 +22,8 @@ import * as servicioTipoPedidos from '../../services/ServicioTipoPedidos';
 import GoogleApiWrapper from './MapComp';
 import GooglePlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-google-places-autocomplete';
 
+const estados = Constantes.estados;
+
 const CrearEditarPedido = () => {
 	const [chofer, setChofer] = useState({});
 	const [cliente, setCliente] = useState({});
@@ -33,26 +35,31 @@ const CrearEditarPedido = () => {
 	const navigate = useNavigate();
 	const { state } = useLocation();
 	const pedido = state?.pedido ? state.pedido : null;
-	const [tarifa, setTarifa] = useState(pedido ? pedido.tarifa : 0);
+
+	const [showMap, setShowMap] = useState(false);
 
 	const [horaLimite, setHoraLimite] = useState(pedido?.horaLimite ? new Date(pedido.horaLimite) : null);
 
+	const [direccion, setDireccion] = useState(null);
+
 	useEffect(() => {
+		if (!process.env.REACT_APP_API_GOOGLE) {
+			window.location = '/error';
+		}
+
 		if (pedido) {
 			const chofer = { value: pedido.chofer.idUsuario, label: `${pedido.chofer.nombre} ${pedido.chofer.apellido}` };
 			const cliente = { value: pedido.cliente.idUsuario, label: `${pedido.cliente.nombre} ${pedido.cliente.apellido}` };
 			const unidad = { value: pedido.transporte.idUnidadTransporte, label: `${pedido.transporte.nombre}` };
-			const tipoPedido = { value: pedido.tipoPedido.idTipoPedido, label: `${pedido.tipoPedido.nombre}` };
+			const tipoPedido = { value: pedido.tipoPedido.idTipoPedido, label: `${pedido.tipoPedido.nombre}`, ...pedido.tipoPedido };
+			setDireccion({ lat: pedido.latitude, lng: pedido.longitude, nombre: pedido.nombreDireccion });
 			setChofer(chofer);
 			setCliente(cliente);
 			setUnidad(unidad);
 			setTipoPedido(tipoPedido);
+			setEstado(estados.find((e) => e.value === pedido.estado));
 		}
 	}, []);
-
-	useEffect(() => {
-		if (tipoPedido?.tarifa) setTarifa(tipoPedido.tarifa);
-	}, [tipoPedido]);
 
 	const checkErrors = () => {
 		setErrors({
@@ -67,19 +74,11 @@ const CrearEditarPedido = () => {
 	const formik = useFormik({
 		initialValues: pedido
 			? {
-					estado: pedido.estado,
-					tamaño: pedido.tamaño,
-					peso: pedido.peso,
-					cubicaje: pedido.cubicaje,
 					apartamento: pedido.apartamento,
 					descripcion: pedido.descripcion,
 					nroPuerta: pedido.nroPuerta,
 			  }
 			: {
-					estado: 0,
-					tamaño: 0,
-					peso: 0,
-					cubicaje: 0,
 					apartamento: '',
 					descripcion: '',
 					nroPuerta: '',
@@ -89,7 +88,7 @@ const CrearEditarPedido = () => {
 		onSubmit: async (values, e) => {
 			try {
 				checkErrors();
-				if (chofer.value && cliente.value && unidad.value && tipoPedido.value && direccion.lat) {
+				if (chofer.value && cliente.value && unidad.value && tipoPedido.value && direccion.lat && estado.value) {
 					const pedidoIngresado = {
 						...values,
 						idPedido: pedido?.idPedido,
@@ -100,8 +99,7 @@ const CrearEditarPedido = () => {
 						estado: estado.value,
 						longitude: direccion.lng,
 						latitude: direccion.lat,
-						nombreDireccion: direccion.value.description,
-						//setDireccion({ lat, lng, nombre: direccion.value.description });
+						nombreDireccion: direccion.nombre,
 						horaLimite: !isNaN(horaLimite) ? horaLimite : null,
 					};
 
@@ -117,7 +115,9 @@ const CrearEditarPedido = () => {
 				} else {
 					toast.error('Ingrese los datos');
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.log(error);
+			}
 		},
 	});
 
@@ -160,7 +160,7 @@ const CrearEditarPedido = () => {
 		const { tiposPedidos, totalRows } = await servicioTipoPedidos.obtenerTipoPedidos({ PageIndex: loadedOptions.length, PageSize: 5, filters });
 		if (tiposPedidos?.length > 0) {
 			return {
-				options: [...tiposPedidos.map((t) => ({ value: t.idTipoPedido, label: `${t.nombre}` }))],
+				options: [...tiposPedidos.map((t) => ({ value: t.idTipoPedido, label: `${t.nombre}`, ...t }))],
 				hasMore: false,
 			};
 		} else {
@@ -175,25 +175,20 @@ const CrearEditarPedido = () => {
 		option: (provided, state) => {
 			return {
 				...provided,
-				color: state.data.value == 1 ? 'yellow' : 'red',
 				zIndex: 9999,
 			};
 		},
 	};
 
-	const [direccion, setDireccion] = useState(null);
-
-	const [showMap, setShowMap] = useState(false);
-
 	useEffect(() => {
 		const time = setTimeout(() => {
 			setShowMap(true);
-		}, 500);
+		}, 1500);
 
 		return () => {
 			clearTimeout(time);
 		};
-	});
+	}, []);
 
 	useEffect(() => {
 		if (direccion?.value) {
@@ -255,6 +250,21 @@ const CrearEditarPedido = () => {
 								setOnChange={(e) => setTipoPedido(e)}
 								styleInputLabel={{ mt: 2 }}
 							/>
+							{console.log(tipoPedido)}
+							{tipoPedido && (
+								<Box sx={{ mt: 1 }}>
+									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
+										Peso desde: <Chip size="small" label={tipoPedido.pesoDesde + ' km'} />
+									</Typography>
+									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
+										Peso hasta: <Chip size="small" label={tipoPedido.pesoHasta + ' km'} />
+									</Typography>
+									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
+										Tarifa: <Chip size="small" label={'$ ' + tipoPedido.tarifa} />
+									</Typography>
+								</Box>
+							)}
+
 							<InputLabel sx={{ mt: 2 }}>Estado</InputLabel>
 							<Select
 								menuPortalTarget={document.querySelector('body')}
@@ -264,57 +274,37 @@ const CrearEditarPedido = () => {
 								styles={customStyles}
 							/>
 							<InputLabel sx={{ mt: 2 }}>Direccion</InputLabel>
-							<GooglePlacesAutocomplete
-								apiKey="AIzaSyDLnUEBnSjB2M-D1JRde3FYfGL6_awhTJE"
-								apiOptions={{ language: 'es' }}
-								autocompletionRequest={{ componentRestrictions: { country: 'uy' } }}
-								selectProps={{
-									direccion,
-									onChange: setDireccion,
-									// onChange: setData, //save the value gotten from google
-									placeholder: 'Busca una dirección',
-									noOptionsMessage: () => (direccion ? 'No se ha encontrado una direccion' : 'Ingrese un dato'),
-									loadingMessage: () => 'Cargando...',
-									// styles: {
-									// zIndex: 9999,
-									//   input: (provided) => ({
-									// 	...provided,
-									// 	zIndex: 9999,
-									//   }),
-									//   option: (provided) => ({
-									// 	...provided,
-									// 	zIndex: 9999,
-									//   }),
-									//   singleValue: (provided) => ({
-									// 	zIndex: 9999,
-									// 	color: "#222222"
-									//   })
-									// }
-								}}
-								onLoadFailed={(error) => {
-									console.log(error);
-								}}
-							/>
+							{/* {console.log(direccion.lat ?)} */}
+							{!direccion?.nombre ? (
+								showMap ? (
+									<GooglePlacesAutocomplete
+										apiKey={process.env.REACT_APP_API_GOOGLE}
+										apiOptions={{ language: 'es' }}
+										autocompletionRequest={{ componentRestrictions: { country: 'uy' } }}
+										selectProps={{
+											onChange: setDireccion,
+											placeholder: 'Busca una dirección',
+											noOptionsMessage: () => (direccion ? 'No se ha encontrado una direccion' : 'Ingrese un dato'),
+											loadingMessage: () => 'Cargando...',
+										}}
+										onLoadFailed={(error) => {
+											console.log(error);
+										}}
+									/>
+								) : (
+									<></>
+								)
+							) : (
+								<Chip label={direccion.nombre} onDelete={() => setDireccion(null)} />
+							)}
+
 							{errors.direccion && (
 								<InputLabel sx={{ mt: '0.3rem', color: '#d32f2f', fontSize: '0.75rem', ml: 1 }}>Ingrese una direccion</InputLabel>
 							)}
 							<Grid item xs={12} sm={6} style={{ height: 280, marginTop: 20, position: 'relative', width: 350 }}>
-								{showMap && <GoogleApiWrapper markerPos={direccion}></GoogleApiWrapper>}
+								<GoogleApiWrapper markerPos={direccion}></GoogleApiWrapper>
 							</Grid>
-							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-								<TextField
-									className="text-start"
-									name="tamaño"
-									variant="outlined"
-									fullWidth
-									id="tamaño"
-									label="Tamaño"
-									value={formik.values.tamaño}
-									onChange={formik.handleChange}
-									error={formik.touched.tamaño && Boolean(formik.errors.tamaño)}
-									helperText={formik.touched.tamaño && formik.errors.tamaño}
-								/>
-							</Grid>
+
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
 								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
 									<TimePicker
@@ -324,39 +314,6 @@ const CrearEditarPedido = () => {
 										renderInput={(params) => <TextField {...params} />}
 									/>
 								</LocalizationProvider>
-							</Grid>
-							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-								<TextField
-									InputLabelProps={{
-										classes: {
-											root: classes.label,
-										},
-									}}
-									name="peso"
-									variant="outlined"
-									fullWidth
-									id="peso"
-									label="Peso"
-									value={formik.values.peso}
-									onChange={formik.handleChange}
-									error={formik.touched.peso && Boolean(formik.errors.peso)}
-									helperText={formik.touched.peso && formik.errors.peso}
-								/>
-								<TextField
-									sx={{ mt: 2 }}
-									InputLabelProps={{
-										classes: {
-											root: classes.label,
-										},
-									}}
-									name="tarifa"
-									variant="outlined"
-									fullWidth
-									id="tarifa"
-									label="Tarifa"
-									value={tarifa}
-									onChange={(t) => setTarifa(t)}
-								/>
 							</Grid>
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
 								<TextField
@@ -447,16 +404,8 @@ const useStyles = () => ({
 });
 
 const validationSchema = yup.object({
-	estado: 0,
 	orden: 0,
 	tipo: 0,
-	tamaño: 0,
 });
 
 export default CrearEditarPedido;
-
-const estados = [
-	{ label: 'Pendiente', value: 1 },
-	{ label: 'En Curso', value: 2 },
-	{ label: 'Finalizado', value: 3 },
-];

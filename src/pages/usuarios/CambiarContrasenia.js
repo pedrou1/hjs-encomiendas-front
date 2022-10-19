@@ -27,15 +27,20 @@ const CambiarContrasenia = () => {
 				usuarioIngresado.password = values.password;
 
 				const res = await servicioUsuarios.modificarContraUsuario(usuarioIngresado);
+				if (!res) {
+					toast.error('Ha ocurrido un error');
+				}
 
 				if (res.operationResult == Constantes.SUCCESS) {
-					navigate('-1');
+					navigate('/usuario/' + usuarioIngresado.idUsuario);
 					toast.success(`Contraseña modificada correctamente`);
 				} else if (res.operationResult == Constantes.ERROR) {
 					toast.error('Ha ocurrido un error');
 					navigate('/error');
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.log(error);
+			}
 		},
 	});
 

@@ -8,9 +8,12 @@ import * as servicioUsuarios from '../../services/ServicioUsuarios';
 import * as authService from '../../services/AuthService';
 import * as Constantes from '../../utils/constantes';
 import { toast } from 'react-toastify';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useState } from 'react';
 
 const IniciarSesion = (prop) => {
 	const navigate = useNavigate();
+	const [loading, setLoading] = useState(false);
 
 	const formik = useFormik({
 		initialValues: {
@@ -20,10 +23,12 @@ const IniciarSesion = (prop) => {
 		validationSchema: validationSchema,
 
 		onSubmit: async (values, e) => {
+			setLoading(true);
 			const res = await servicioUsuarios.iniciarSesion(values);
 			if (res?.operationResult == Constantes.SUCCESS) {
-				res.usuario.permiso = Constantes.PERMISO_ADMINISTRADOR; // FIXME
+				res.usuario.permiso = res.usuario.idCategoria;
 				authService.setLoggedIn(res.jwtToken, res.usuario);
+				setLoading(false);
 				window.location = '/usuarios';
 				toast.success('Bienvenido');
 			} else if (res.operationResult == Constantes.ERROR) {
@@ -31,6 +36,7 @@ const IniciarSesion = (prop) => {
 			} else if (res.operationResult == Constantes.INVALIDUSER) {
 				toast.error('Usuario o contraseña incorrecta');
 			}
+			setLoading(false);
 		},
 	});
 	const classes = useStyles();
@@ -104,9 +110,15 @@ const IniciarSesion = (prop) => {
 							</Grid>
 							<Box mt={12} />
 						</Grid>
-						<Button type="submit" color="primary" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-							Iniciar sesión
-						</Button>
+						{!loading ? (
+							<Button type="submit" color="primary" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+								Iniciar sesión
+							</Button>
+						) : (
+							<div>
+								<CircularProgress sx={{ mt: 3, mb: 1 }} />
+							</div>
+						)}
 						<Grid container>
 							<Grid item xs>
 								<Box mt={2} />

@@ -82,7 +82,9 @@ const CrearEditarGasto = () => {
 				} else {
 					toast.error('Ingrese los datos');
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.log(error);
+			}
 		},
 	});
 

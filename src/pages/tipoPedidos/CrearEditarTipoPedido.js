@@ -19,8 +19,8 @@ const CrearEditarTipoPedido = () => {
 			? {
 					nombre: tipoPedido.nombre,
 					pesoDesde: tipoPedido.pesoDesde,
-                    pesoHasta: tipoPedido.pesoHasta,
-                    tarifa: tipoPedido.tarifa,
+					pesoHasta: tipoPedido.pesoHasta,
+					tarifa: tipoPedido.tarifa,
 			  }
 			: {
 					nombre: '',
@@ -34,7 +34,9 @@ const CrearEditarTipoPedido = () => {
 			try {
 				const tipoPedidoIngresado = { ...values, idTipoPedido: tipoPedido?.idTipoPedido };
 
-				const res = tipoPedido ? await servicioTipoPedidos.modificarTipoPedido(tipoPedidoIngresado) : await servicioTipoPedidos.registrarTipoPedido(tipoPedidoIngresado);
+				const res = tipoPedido
+					? await servicioTipoPedidos.modificarTipoPedido(tipoPedidoIngresado)
+					: await servicioTipoPedidos.registrarTipoPedido(tipoPedidoIngresado);
 
 				if (res.operationResult == Constantes.SUCCESS) {
 					navigate('/tipos-pedidos');
@@ -43,7 +45,9 @@ const CrearEditarTipoPedido = () => {
 					toast.error('Ha ocurrido un error');
 					navigate('/error');
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.log(error);
+			}
 		},
 	});
 
@@ -102,6 +106,11 @@ const CrearEditarTipoPedido = () => {
 										},
 									}}
 									type="number"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
 									name="pesoDesde"
 									variant="outlined"
 									fullWidth
@@ -122,6 +131,11 @@ const CrearEditarTipoPedido = () => {
 										},
 									}}
 									type="number"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
 									name="pesoHasta"
 									variant="outlined"
 									fullWidth
@@ -143,6 +157,12 @@ const CrearEditarTipoPedido = () => {
 									}}
 									name="tarifa"
 									variant="outlined"
+									type="number"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
 									fullWidth
 									id="tarifa"
 									label="Tarifa"

@@ -1,11 +1,14 @@
 import Chart from 'react-apexcharts';
-import { Button, Grid, Typography, Container, Paper, Stack } from '@mui/material';
+import { Button, Grid, Typography, Container, Paper, CssBaseline, Box, } from '@mui/material';
 import { Helmet } from 'react-helmet';
 import { useEffect, useState } from 'react';
 import * as servicioPedidos from '../../services/ServicioPedidos';
 import * as servicioUsuarios from '../../services/ServicioUsuarios';
+import { defaultStyles } from '../../utils/defaultStyles';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Estadisticas = () => {
+	const [loading, setLoading] = useState(false);
 	//create state series
 	const [cantidadPedidos, setCantidadPedidos] = useState([
 		{
@@ -25,26 +28,41 @@ const Estadisticas = () => {
 	}, []);
 
 	const obtenerCantidadPedidos = async () => {
+		setLoading(true)
 		const cantidadP = await servicioPedidos.obtenerCantidadPedidosPorMes();
 		setCantidadPedidos([{ ...cantidadPedidos[0], data: cantidadP }]);
 
 		const cantidadC = await servicioUsuarios.obtenerCantidadClientesPorMes();
 		setCantidadClientes([{ ...cantidadClientes[0], data: cantidadC }]);
+		setLoading(false)
 	};
 
 	return (
-		<div>
+		<Container component="main">
 			<Helmet>
 				<title>Ver perfil</title>
 			</Helmet>
-			<Grid item xs={12} lg={4}>
+			<CssBaseline />
+			<Paper
+				sx={{
+					...defaultStyles.boxShadow,
+					paddingX: 6,
+					paddingY: 2,
+				}}
+			>
+				<Box>
+			<Grid className='align-items-center d-flex flex-column'>
+				<>
 				<Typography variant="h6">Pedidos</Typography>
 				<Chart options={options} series={cantidadPedidos} type="bar" width={800} height={320} />
-				<Typography variant="h6">Clientes nuevos</Typography>
+
+				{loading ? <div className='mb-1'><CircularProgress /></div> : 	<Typography variant="h6">Clientes nuevos</Typography>}
+
 				<Chart options={options} series={cantidadClientes} type="line" width={800} height={320} />
-			</Grid>
-		</div>
-	);
+				</>
+			</Grid></Box></Paper>
+			</Container>
+	)
 };
 export default Estadisticas;
 

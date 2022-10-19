@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as servicioPedidos from '../../services/ServicioPedidos';
 import KeyIcon from '@mui/icons-material/Key';
+import * as authService from '../../services/AuthService';
 
 const VerUsuario = () => {
 	const [usuario, setUsuario] = useState({});
@@ -28,11 +29,15 @@ const VerUsuario = () => {
 	const [countPedidos, setCountPedidos] = useState(0);
 	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
+	const [esAdmin, setEsAdmin] = useState(false);
 
 	const navigate = useNavigate();
 	const classes = useStyles();
 
 	useEffect(() => {
+		const usuarioActual = authService.getCurrentUser();
+		setEsAdmin(usuarioActual.idCategoria === Constantes.ID_ADMINISTRADOR);
+
 		getUsuario();
 		getPedidos();
 	}, []);
@@ -85,22 +90,29 @@ const VerUsuario = () => {
 			{usuario && (
 				<div>
 					<Grid item xs={3} lg={3} className="d-flex flex-column">
-						<div className="align-self-end">
-						<Button variant="outlined" sx={{ mr: 1 }} startIcon={<KeyIcon />} onClick={() => navigate('/usuario/cambiar-password', { state: {  usuario } })}>
-								Cambiar contraseña
-							</Button>
-							<Button
-								variant="outlined"
-								sx={{ mr: 1 }}
-								startIcon={<EditIcon />}
-								onClick={() => navigate('/crear-usuario', { state: { usuario: usuario } })}
-							>
-								Modificar
-							</Button>
-							<Button variant="outlined" startIcon={<DeleteIcon />} onClick={() => setOpenModal(!openModal)}>
-								Eliminar
-							</Button>
-						</div>
+						{esAdmin && (
+							<div className="align-self-end">
+								<Button
+									variant="outlined"
+									sx={{ mr: 1 }}
+									startIcon={<KeyIcon />}
+									onClick={() => navigate('/usuario/cambiar-password', { state: { usuario } })}
+								>
+									Cambiar contraseña
+								</Button>
+								<Button
+									variant="outlined"
+									sx={{ mr: 1 }}
+									startIcon={<EditIcon />}
+									onClick={() => navigate('/crear-usuario', { state: { usuario: usuario } })}
+								>
+									Modificar
+								</Button>
+								<Button variant="outlined" startIcon={<DeleteIcon />} onClick={() => setOpenModal(!openModal)}>
+									Eliminar
+								</Button>
+							</div>
+						)}
 						<ModalDialog
 							open={openModal}
 							titulo="¿Estas seguro?"
@@ -122,7 +134,7 @@ const VerUsuario = () => {
 										<Stack spacing={1}>
 											<UserInfoText>
 												<PersonOutlineOutlinedIcon />
-												<Typography variant="body1">Hombre</Typography>
+												<Typography variant="body1">[Hombre[</Typography>
 											</UserInfoText>
 											{usuario.telefono && (
 												<UserInfoText>

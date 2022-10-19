@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import FolderOffIcon from '@mui/icons-material/FolderOff';
 import { defaultStyles } from '../utils/defaultStyles';
 
-const Table = ({ title, data = [], columns, totalRows, onPageChange, onRowClicked, isLoadingFinished }) => {
+const Table = ({ title, data = [], columns, totalRows, onPageChange, onRowClicked, isLoadingFinished, children }) => {
 	const [pageSize, setPageSize] = useState(10);
 	const [pageIndex, setPageIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
@@ -34,8 +34,9 @@ const Table = ({ title, data = [], columns, totalRows, onPageChange, onRowClicke
 
 	return (
 		<TableContainer component={Paper} className="mb-4 mt-2" sx={data && !data.length && !loading ? styles.tableEmpty : { ...defaultStyles.boxShadow }}>
+			{children}
 			<DataTable
-				title={<div className="mt-4">{title}</div>}
+				title={title ? <div className="mt-4">{title}</div> : null}
 				columns={columns}
 				data={data}
 				pagination

@@ -20,21 +20,27 @@ const CrearEditarUsuario = () => {
 					nombre: usuario.nombre,
 					apellido: usuario.apellido,
 					telefono: usuario.telefono ? usuario.telefono : '',
+					telefono2: usuario.telefono2 ? usuario.telefono2 : '',
 					direccion: usuario.direccion ? usuario.direccion : '',
 					email: usuario.email ? usuario.email : '',
 					usuario: usuario.usuario ? usuario.usuario : '',
 					categoriaUsuario: usuario.idCategoria,
 					password: '',
+					apartamento: usuario.apartamento ? usuario.apartamento : '',
+					nroPuerta: usuario.nroPuerta ? usuario.nroPuerta : '',
 			  }
 			: {
 					nombre: '',
 					apellido: '',
 					telefono: '',
+					telefono2: '',
+					nroPuerta: '',
 					direccion: '',
 					email: '',
 					usuario: '',
 					password: '',
 					categoriaUsuario: Constantes.ID_CLIENTE,
+					apartamento: '',
 			  },
 		validationSchema: validationSchema,
 
@@ -53,7 +59,9 @@ const CrearEditarUsuario = () => {
 					toast.error('Ha ocurrido un error');
 					navigate('/error');
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.log(error);
+			}
 		},
 	});
 
@@ -157,6 +165,64 @@ const CrearEditarUsuario = () => {
 									onChange={formik.handleChange}
 									error={formik.touched.telefono && Boolean(formik.errors.telefono)}
 									helperText={formik.touched.telefono && formik.errors.telefono}
+								/>
+							</Grid>
+
+							<Grid item xs={12}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="telefono2"
+									variant="outlined"
+									fullWidth
+									id="telefono2"
+									label="Teléfono secundario"
+									autoFocus
+									value={formik.values.telefono2}
+									onChange={formik.handleChange}
+									error={formik.touched.telefono2 && Boolean(formik.errors.telefono2)}
+									helperText={formik.touched.telefono2 && formik.errors.telefono2}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="apartamento"
+									variant="outlined"
+									fullWidth
+									id="apartamento"
+									label="Apartamento"
+									value={formik.values.apartamento}
+									onChange={formik.handleChange}
+									error={formik.touched.apartamento && Boolean(formik.errors.apartamento)}
+									helperText={formik.touched.apartamento && formik.errors.apartamento}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="nroPuerta"
+									variant="outlined"
+									fullWidth
+									id="nroPuerta"
+									label="Numero de puerta"
+									value={formik.values.nroPuerta}
+									onChange={formik.handleChange}
+									error={formik.touched.nroPuerta && Boolean(formik.errors.nroPuerta)}
+									helperText={formik.touched.nroPuerta && formik.errors.nroPuerta}
 								/>
 							</Grid>
 
@@ -280,6 +346,9 @@ const validationSchema = yup.object({
 	apellido: yup.string('Introduce tu apellido').min(4, 'El apellido debe tener una longitud mínima de 4 caracteres').required('Introduce tu apellido'),
 	email: yup.string('Introduce tu email').email('Formato incorrecto'),
 	telefono: yup.string('Introduce tu teléfono').min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres'),
+	telefono2: yup.string('Introduce tu teléfono').min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres'),
+	apartamento: yup.string('Introduce tu apartamento').min(4, 'El apartamento debe tener una longitud mínima de 4 caracteres'),
+	nroPuerta: yup.string('Introduce tu número de puerta'),
 	direccion: yup.string('Introduce tu dirección').min(4, 'La dirección debe tener una longitud mínima de 4 caracteres'),
 	usuario: yup.string('Introduce tu nombre de usuario').min(4, 'El nombre de usuario debe tener una longitud mínima de 4 caracteres'),
 	password: yup.string('Introduce tu contraseña').min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres'),

@@ -44,7 +44,7 @@ function App() {
 				<NavBar usuario={usuario} />
 				{usuario?.permiso == Constantes.PERMISO_ADMINISTRADOR ? <Sidebar /> : <></>}
 				<Routes>
-					<Route path="/" element={<Navigate replace to="/iniciar-sesion" />} />
+					<Route path="/" element={<Navigate replace to="/usuarios" />} />
 					<Route path="/registrar" exact element={<RegistrarUsuario />} />
 					<Route path="/iniciar-sesion" exact element={<IniciarSesion />} />
 					<Route path="/error" exact element={<Error />} />
@@ -70,7 +70,7 @@ function App() {
 						path="/usuario/:idUsuario"
 						exact
 						element={
-							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR, Constantes.PERMISO_CHOFER]}>
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR, Constantes.PERMISO_CHOFER, Constantes.PERMISO_CLIENTE]}>
 								<VerUsuario />
 							</ProtectedRoute>
 						}

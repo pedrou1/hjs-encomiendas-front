@@ -51,11 +51,9 @@ export const registrarPedido = async (pedido) => {
 
 export const modificarPedido = async (pedido) => {
 	try {
-		const res = await http.post(url + '/modificar', pedido);
+		const res = await http.put(url + '/modificar', pedido);
 		if (res.status == 200) {
 			return res.data;
 		}
 	} catch (err) {}
 };
-
-

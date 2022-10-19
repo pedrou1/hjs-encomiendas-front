@@ -1,4 +1,4 @@
-import { Button, CssBaseline, Box, Container, IconButton } from '@mui/material';
+import { Button, CssBaseline, Box, Container, IconButton, InputLabel, Grid, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Helmet } from 'react-helmet';
 import { useEffect, useState } from 'react';
@@ -11,6 +11,10 @@ import ModalDialog from '../../components/ModalDialog';
 import { toast } from 'react-toastify';
 import * as Constantes from '../../utils/constantes';
 import { columnasPedidos } from '../../utils/columnasTablas';
+import Select from 'react-select';
+import Filtros from './../../components/Filtros';
+
+const estados = Constantes.estados;
 
 const Pedidos = () => {
 	const [pedidos, setPedidos] = useState([]);
@@ -19,6 +23,7 @@ const Pedidos = () => {
 	const [openModal, setOpenModal] = useState(false);
 	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [pedidoSeleccionado, setPedidoSeleccionado] = useState({});
+	const [estado, setEstado] = useState([estados[0]]);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -31,9 +36,9 @@ const Pedidos = () => {
 		}
 	}, [pedidoSeleccionado]);
 
-	const getPedidos = async (newPaginationData) => {
+	const getPedidos = async (newPaginationData, estado) => {
 		if (newPaginationData) setPaginationData(newPaginationData);
-		const { pedidos, totalRows, operationResult } = await servicioPedidos.obtenerPedidos(newPaginationData || paginationData);
+		const { pedidos, totalRows, operationResult } = await servicioPedidos.obtenerPedidos(newPaginationData || paginationData, estado);
 		setPedidos(pedidos);
 		setCountPedidos(totalRows);
 		setLoadingFinished(operationResult == 1 ? true : false);
@@ -46,6 +51,15 @@ const Pedidos = () => {
 	const actualizarTabla = async () => {
 		await getPedidos();
 		setPedidoSeleccionado({});
+	};
+
+	const handleFiltrar = async () => {
+		const estadosParsed = estado.map((e) => e.value);
+		console.log(estadosParsed);
+		// if(estado.length){
+		//  getPedidos(null, estadosParsed);
+		// }
+		// setPedidoSeleccionado({});
 	};
 
 	const goToVerPedidos = (pedido) => {
@@ -77,6 +91,16 @@ const Pedidos = () => {
 			),
 		},
 	];
+
+	const customStyles = {
+		option: (provided, state) => {
+			return {
+				...provided,
+				color: 'black',
+				zIndex: 9999,
+			};
+		},
+	};
 
 	return (
 		<Container component="main">
@@ -116,14 +140,44 @@ const Pedidos = () => {
 					</Button>
 				</div>
 				<Table
-					title="Pedidos"
+					// title="Pedidos"
 					data={pedidos}
 					columns={columnas}
 					totalRows={countPedidos}
 					isLoadingFinished={loadingFinished}
 					onPageChange={onPageChange}
 					onRowClicked={goToVerPedidos}
-				/>
+				>
+					<Grid item xs={3} lg={3} className="d-flex flex-column">
+						<div className="align-self-end">
+							<Filtros>
+								<Typography>Filtros</Typography>
+								<InputLabel sx={{ mt: 2 }}>Estado</InputLabel>
+
+								<Select
+									menuPortalTarget={document.querySelector('.MuiPaper-elevation')}
+									value={estado}
+									isMulti
+									options={estados}
+									onChange={(e) => setEstado(e)}
+									styles={customStyles}
+									noOptionsMessage={() => 'No hay mas datos'}
+									placeholder={''}
+								/>
+								<Button
+									onClick={() => {
+										handleFiltrar();
+									}}
+									disabled={!estado.length}
+									variant="contained"
+									style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+								>
+									Filtrar
+								</Button>
+							</Filtros>
+						</div>
+					</Grid>
+				</Table>
 			</Box>
 		</Container>
 	);
