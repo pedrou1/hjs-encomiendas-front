@@ -152,9 +152,22 @@ const cols = [
 		grow: 1,
 	},
 	{
-		name: 'Capacidad',
-		selector: (row) => row.capacidad,
+		name: 'Marca',
+		selector: (row) => row?.marca,
 		sortable: true,
 		grow: 1,
+		cell: (row) => (row?.marca ? row?.marca : <div>-</div>),
+	},
+	{
+		name: 'Modelo',
+		selector: (row) => row?.modelo,
+		grow: 1,
+		cell: (row) => (row?.modelo ? row?.modelo : <div>-</div>),
+	},
+	{
+		name: 'Año',
+		selector: (row) => row?.anio,
+		grow: 1,
+		cell: (row) => (row?.anio ? row?.anio : <div>-</div>),
 	},
 ];

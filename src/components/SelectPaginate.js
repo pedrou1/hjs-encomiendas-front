@@ -1,7 +1,7 @@
 import { InputLabel, FormHelperText } from '@mui/material';
 import { AsyncPaginate } from 'react-select-async-paginate';
 
-function SelectPaginate({ label, value, loadOptions, setOnChange, errorLabel, styleInputLabel = {} }) {
+function SelectPaginate({ label, value, loadOptions, setOnChange, errorLabel, styleInputLabel = {}, menuPortalTargetName = 'body', stylesCustm }) {
 	return (
 		<>
 			<InputLabel sx={styleInputLabel}>{label}</InputLabel>
@@ -11,9 +11,10 @@ function SelectPaginate({ label, value, loadOptions, setOnChange, errorLabel, st
 				onChange={(c) => {
 					setOnChange(c);
 				}}
-				menuPortalTarget={document.querySelector('body')}
+				menuPortalTarget={document.querySelector(menuPortalTargetName)}
 				loadingMessage={() => 'Cargando...'}
-				noOptionsMessage={() => 'No se ha encontrado datos' }
+				noOptionsMessage={() => 'No se ha encontrado datos'}
+				styles={stylesCustm}
 			/>
 			<FormHelperText
 				error={Boolean(true)}

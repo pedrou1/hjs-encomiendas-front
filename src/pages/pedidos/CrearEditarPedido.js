@@ -225,6 +225,7 @@ const CrearEditarPedido = () => {
 								value={chofer}
 								loadOptions={loadOptionsChofer}
 								setOnChange={setChofer}
+								styleInputLabel={{ mt: 2 }}
 							/>
 							<SelectPaginate
 								label="Cliente"
@@ -251,7 +252,7 @@ const CrearEditarPedido = () => {
 								styleInputLabel={{ mt: 2 }}
 							/>
 							{console.log(tipoPedido)}
-							{tipoPedido && (
+							{tipoPedido && tipoPedido.pesoDesde && (
 								<Box sx={{ mt: 1 }}>
 									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
 										Peso desde: <Chip size="small" label={tipoPedido.pesoDesde + ' km'} />
@@ -272,6 +273,7 @@ const CrearEditarPedido = () => {
 								options={estados}
 								onChange={(e) => setEstado(e)}
 								styles={customStyles}
+								styleInputLabel={{ mt: 2 }}
 							/>
 							<InputLabel sx={{ mt: 2 }}>Direccion</InputLabel>
 							{/* {console.log(direccion.lat ?)} */}
@@ -306,6 +308,25 @@ const CrearEditarPedido = () => {
 							</Grid>
 
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="descripcion"
+									variant="outlined"
+									fullWidth
+									id="descripcion"
+									label="Descripcion"
+									value={formik.values.descripcion}
+									onChange={formik.handleChange}
+									error={formik.touched.descripcion && Boolean(formik.errors.descripcion)}
+									helperText={formik.touched.descripcion && formik.errors.descripcion}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
 								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
 									<TimePicker
 										label="Hora límite"
@@ -331,25 +352,6 @@ const CrearEditarPedido = () => {
 									onChange={formik.handleChange}
 									error={formik.touched.apartamento && Boolean(formik.errors.apartamento)}
 									helperText={formik.touched.apartamento && formik.errors.apartamento}
-								/>
-							</Grid>
-
-							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-								<TextField
-									InputLabelProps={{
-										classes: {
-											root: classes.label,
-										},
-									}}
-									name="descripcion"
-									variant="outlined"
-									fullWidth
-									id="descripcion"
-									label="Descripcion"
-									value={formik.values.descripcion}
-									onChange={formik.handleChange}
-									error={formik.touched.descripcion && Boolean(formik.errors.descripcion)}
-									helperText={formik.touched.descripcion && formik.errors.descripcion}
 								/>
 							</Grid>
 

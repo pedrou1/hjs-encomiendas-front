@@ -24,6 +24,19 @@ export const columnasPedidos = [
 		selector: (row) => row.estado,
 		sortable: true,
 		grow: 1,
-		cell: (row) => <div>{estados[row.estado].label}</div>,
+		cell: (row) => <div>{row.estado && row.estado != 0 ? estados.find((e) => e.value === row.estado)?.label : ''}</div>,
+	},
+	{
+		name: 'Tipo',
+		selector: (row) => row.tipoPedido.nombre,
+		sortable: true,
+		grow: 1,
+	},
+	{
+		name: 'Dirección',
+		selector: (row) => row?.nombreDireccion,
+		sortable: true,
+		grow: 1,
+		cell: (row) => (row?.nombreDireccion ? row.nombreDireccion.substring(0, 35) + `${row.nombreDireccion.length > 35 ? '...' : ''}` : <div>-</div>),
 	},
 ];

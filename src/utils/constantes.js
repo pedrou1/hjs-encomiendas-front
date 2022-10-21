@@ -19,3 +19,9 @@ export const estados = [
 	{ label: 'Entregado', value: 3 },
 	{ label: 'Cancelado', value: 4 },
 ];
+
+export const categoriasUsuarios = [
+	{ label: 'Cliente', value: 1 },
+	{ label: 'Chofer', value: 2 },
+	{ label: 'Administrador', value: 3 },
+];

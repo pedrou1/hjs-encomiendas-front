@@ -165,6 +165,7 @@ const CrearEditarGasto = () => {
 								value={usuario}
 								loadOptions={loadOptionsUsuario}
 								setOnChange={setUsuario}
+								styleInputLabel={{ mt: 2 }}
 							/>
 
 							<SelectPaginate

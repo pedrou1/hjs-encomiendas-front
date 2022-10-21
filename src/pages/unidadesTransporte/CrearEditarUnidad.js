@@ -31,7 +31,6 @@ const CrearEditarUnidad = () => {
 			? {
 					nombre: unidad.nombre,
 					promedioConsumo: unidad.promedioConsumo,
-					capacidad: unidad.capacidad ? unidad.capacidad : 0,
 					marca: unidad.marca ? unidad.marca : '',
 					modelo: unidad.modelo ? unidad.modelo : '',
 					anio: unidad.anio ? unidad.anio : 0,
@@ -41,7 +40,6 @@ const CrearEditarUnidad = () => {
 			: {
 					nombre: '',
 					promedioConsumo: 0,
-					capacidad: 0,
 					marca: '',
 					modelo: '',
 					anio: 0,
@@ -160,31 +158,6 @@ const CrearEditarUnidad = () => {
 									onChange={formik.handleChange}
 									error={formik.touched.promedioConsumo && Boolean(formik.errors.promedioConsumo)}
 									helperText={formik.touched.promedioConsumo && formik.errors.promedioConsumo}
-								/>
-							</Grid>
-
-							<Grid item xs={12} sm={6}>
-								<TextField
-									InputLabelProps={{
-										classes: {
-											root: classes.label,
-										},
-									}}
-									name="capacidad"
-									variant="outlined"
-									type="number"
-									onKeyPress={(event) => {
-										if (!/[0-9]/.test(event.key)) {
-											event.preventDefault();
-										}
-									}}
-									fullWidth
-									id="capacidad"
-									label="Capacidad"
-									value={formik.values.capacidad}
-									onChange={formik.handleChange}
-									error={formik.touched.capacidad && Boolean(formik.errors.capacidad)}
-									helperText={formik.touched.capacidad && formik.errors.capacidad}
 								/>
 							</Grid>
 
@@ -337,7 +310,6 @@ const useStyles = () => ({
 const validationSchema = yup.object({
 	nombre: yup.string('Introduce el nombre').min(4, 'El nombre debe tener una longitud mínima de 4 caracteres').required('Introduce el nombre'),
 	promedioConsumo: yup.number('Introduce el promedio consumo').min(0).required('Introduce el promedio consumo'),
-	capacidad: yup.number('Introduce la capacidad').min(0).required('Introduce la capacidad'),
 });
 
 export default CrearEditarUnidad;

@@ -47,3 +47,12 @@ export const modificarUnidad = async (unidad) => {
 		}
 	} catch (err) {}
 };
+
+export const otenerUnidadDeChofer = async (idChofer) => {
+	try {
+		const res = await http.get(`${url}/chofer/${idChofer}`);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};

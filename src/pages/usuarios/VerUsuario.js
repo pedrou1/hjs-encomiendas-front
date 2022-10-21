@@ -20,6 +20,8 @@ import { toast } from 'react-toastify';
 import * as servicioPedidos from '../../services/ServicioPedidos';
 import KeyIcon from '@mui/icons-material/Key';
 import * as authService from '../../services/AuthService';
+import * as servicioUnidades from '../../services/ServicioUnidades';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
 const VerUsuario = () => {
 	const [usuario, setUsuario] = useState({});
@@ -30,6 +32,7 @@ const VerUsuario = () => {
 	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 	const [esAdmin, setEsAdmin] = useState(false);
+	const [unidad, setUnidad] = useState('');
 
 	const navigate = useNavigate();
 	const classes = useStyles();
@@ -44,6 +47,11 @@ const VerUsuario = () => {
 
 	const getUsuario = async () => {
 		const usuario = await servicioUsuarios.obtenerUsuario(idUsuario);
+		const unidad = await servicioUnidades.otenerUnidadDeChofer(idUsuario);
+
+		if (unidad) {
+			setUnidad(unidad.nombre);
+		}
 
 		setUsuario(usuario);
 	};
@@ -132,10 +140,12 @@ const VerUsuario = () => {
 										</Stack>
 										<br />
 										<Stack spacing={1}>
-											<UserInfoText>
-												<PersonOutlineOutlinedIcon />
-												<Typography variant="body1">[Hombre[</Typography>
-											</UserInfoText>
+											{usuario.usuario && (
+												<UserInfoText>
+													<PersonOutlineOutlinedIcon />
+													<Typography variant="body1">{usuario.usuario}</Typography>
+												</UserInfoText>
+											)}
 											{usuario.telefono && (
 												<UserInfoText>
 													<LocalPhoneOutlinedIcon />
@@ -146,6 +156,13 @@ const VerUsuario = () => {
 												<AdminPanelSettingsIcon />
 												<Typography variant="body1">{usuario.categoriaUsuario?.nombre}</Typography>
 											</UserInfoText>
+
+											{unidad && (
+												<UserInfoText>
+													<LocalShippingIcon />
+													<Typography variant="body1">{unidad}</Typography>
+												</UserInfoText>
+											)}
 											{usuario.email && (
 												<UserInfoText>
 													<EmailIcon />
