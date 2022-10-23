@@ -136,25 +136,25 @@ const cols = [
 	{
 		name: 'Nombre',
 		selector: (row) => `${row.nombre}`,
-		sortable: true,
+		sortable: false,
 		grow: 1,
 	},
 	{
 		name: 'Desde (KG)',
 		selector: (row) => `${row.pesoDesde}`,
-		sortable: true,
+		sortable: false,
 		grow: 1,
 	},
 	{
 		name: 'Hasta (KG)',
 		selector: (row) => row.pesoHasta,
-		sortable: true,
+		sortable: false,
 		grow: 1,
 	},
 	{
 		name: 'Tarifa',
 		selector: (row) => row.tarifa,
-		sortable: true,
+		sortable: false,
 		grow: 1,
 	},
 ];

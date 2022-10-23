@@ -25,7 +25,6 @@ const estados = Constantes.estados;
 const Pedidos = () => {
 	const [pedidos, setPedidos] = useState([]);
 	const [countPedidos, setCountPedidos] = useState(0);
-	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 	const [openModal, setOpenModal] = useState(false);
 	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [pedidoSeleccionado, setPedidoSeleccionado] = useState({});
@@ -34,6 +33,7 @@ const Pedidos = () => {
 	const [fechaDesde, setFechaDesde] = useState(null);
 	const [fechaHasta, setFechaHasta] = useState(null);
 	const [unidadSeleccionada, setUnidadSeleccionada] = useState({});
+	const [globalParams, setGlobalParams] = useState({ PageIndex: 0, PageSize: 10 });
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -56,10 +56,29 @@ const Pedidos = () => {
 	}, [fechaDesde, fechaHasta]);
 
 	const getPedidos = async (newPaginationData, newParams) => {
-		if (newPaginationData) setPaginationData(newPaginationData);
-		let params = newPaginationData || paginationData;
-		if (newParams) params = { ...params, ...newParams };
+		let params = globalParams;
+		if (newPaginationData) {
+			params.PageIndex = newPaginationData.PageIndex;
+			params.PageSize = newPaginationData.PageSize;
+		}
+
+		if (newParams != null || newParams != undefined) {
+			params.estados = newParams.estados;
+			params.fechaDesde = newParams.fechaDesde;
+			params.fechaHasta = newParams.fechaHasta;
+			params.idUnidad = newParams.idUnidad;
+		} else {
+			if (!newPaginationData) {
+				params.estados = [];
+				params.fechaDesde = null;
+				params.fechaHasta = null;
+				params.idUnidad = null;
+			}
+		}
+
 		const { pedidos, totalRows, operationResult } = await servicioPedidos.obtenerPedidos(params);
+
+		setGlobalParams(params);
 		setPedidos(pedidos);
 		setCountPedidos(totalRows);
 		setLoadingFinished(operationResult == 1 ? true : false);
@@ -75,7 +94,7 @@ const Pedidos = () => {
 	};
 
 	const handleFiltrar = async () => {
-		let params = {};
+		let params = { idUnidad: 0, fechaDesde: null, fechaHasta: null, estados: [] };
 		params.estados = estado.map((e) => e.value);
 
 		if (params.estados && params.estados.length) {
@@ -189,14 +208,14 @@ const Pedidos = () => {
 				>
 					<Grid item xs={3} lg={3} className="d-flex justify-content-between">
 						<div></div>
-						<div className="pt-3">
+						<div className="pt-4" style={{ marginLeft: '5.5rem' }}>
 							<h4>Pedidos</h4>
 						</div>
 
 						<div className="align-self-end">
 							<Filtros anchorEl={openFiltros} setAnchorEl={setOpenFiltros}>
 								<Typography>Filtros</Typography>
-								<InputLabel sx={{ mt: 2 }}>Estado</InputLabel>
+								<InputLabel sx={{ mt: 1 }}>Estado</InputLabel>
 								<div>
 									<Select
 										menuPortalTarget={document.querySelector('.MuiPaper-elevation')}
@@ -235,32 +254,36 @@ const Pedidos = () => {
 										/>
 									</LocalizationProvider>
 								</div>
-								<Button
-									onClick={() => {
-										handleFiltrar();
-										setOpenFiltros(false);
-									}}
-									variant="contained"
-									className="mt-2"
-									style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
-								>
-									Filtrar
-								</Button>
-								<Button
-									onClick={() => {
-										setEstado([]);
-										setUnidadSeleccionada({});
-										setFechaDesde(null);
-										setFechaHasta(null);
-										setOpenFiltros(false);
-										getPedidos();
-									}}
-									variant="outlined"
-									className="mt-2 ml-2"
-									style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
-								>
-									Limpiar
-								</Button>
+								<div className="mt-2 pb-1  d-flex justify-content-start">
+									<div className="mr-2">
+										<Button
+											onClick={() => {
+												handleFiltrar();
+												setOpenFiltros(false);
+											}}
+											variant="contained"
+											style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+										>
+											Filtrar
+										</Button>
+									</div>
+									<div className="pb-1" style={{ marginLeft: '0.8rem' }}>
+										<Button
+											onClick={() => {
+												setEstado([]);
+												setUnidadSeleccionada({});
+												setFechaDesde(null);
+												setFechaHasta(null);
+												setOpenFiltros(false);
+												getPedidos();
+											}}
+											variant="outlined"
+											style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+										>
+											Limpiar
+										</Button>
+									</div>
+								</div>
 							</Filtros>
 						</div>
 					</Grid>

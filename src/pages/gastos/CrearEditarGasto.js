@@ -93,7 +93,9 @@ const CrearEditarGasto = () => {
 	async function loadOptionsUsuario(search, loadedOptions) {
 		const filters = JSON.stringify(search.trim().split(/\s+/));
 
-		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters });
+		const categorias = JSON.stringify([Constantes.ID_CHOFER, Constantes.ID_ADMINISTRADOR]);
+
+		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, categorias, filters });
 
 		return {
 			options: [...usuarios.map((u) => ({ value: u.idUsuario, label: `${u.nombre} ${u.apellido}` }))],
@@ -124,7 +126,7 @@ const CrearEditarGasto = () => {
 	return (
 		<Container component="main" maxWidth="sm">
 			<Helmet>
-				<title>Crear Gasto</title>
+				<title>{gasto ? 'Modificar Gasto' : 'Crear Gasto'}</title>
 			</Helmet>
 			<CssBaseline />
 			<Paper
@@ -150,7 +152,7 @@ const CrearEditarGasto = () => {
 								variant="outlined"
 								fullWidth
 								id="descripcion"
-								label="Descripcion"
+								label="Descripción"
 								value={formik.values.descripcion}
 								onChange={formik.handleChange}
 								error={formik.touched.descripcion && Boolean(formik.errors.descripcion)}
@@ -192,6 +194,12 @@ const CrearEditarGasto = () => {
 											root: classes.label,
 										},
 									}}
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
+									type="number"
 									name="costo"
 									variant="outlined"
 									fullWidth

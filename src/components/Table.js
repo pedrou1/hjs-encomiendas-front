@@ -25,7 +25,6 @@ const Table = ({ title, data = [], columns, totalRows, onPageChange, onRowClicke
 
 	const handlePerRowsChange = async (newPageSize, page) => {
 		// cambio de cantidad de paginacion
-		console.log(newPageSize, page);
 		const paginationData = { PageIndex: (page - 1) * pageSize, PageSize: newPageSize };
 		setPageSize(newPageSize);
 		setLoading(true);

@@ -31,7 +31,6 @@ export const obtenerCantidadPedidosPorMes = async () => {
 
 export const eliminarPedido = async (idPedido) => {
 	try {
-		console.log(idPedido);
 		const res = await http.delete(`${url}/${idPedido}`);
 		if (res.status == 200) {
 			return res.data;
@@ -40,7 +39,6 @@ export const eliminarPedido = async (idPedido) => {
 };
 
 export const registrarPedido = async (pedido) => {
-	console.log(pedido);
 	try {
 		const res = await http.post(url + '/crear', pedido);
 		if (res.status == 200) {

@@ -61,6 +61,19 @@ const CrearEditarPedido = () => {
 		}
 	}, []);
 
+	useEffect(() => {
+		if (chofer.value) {
+			setUnidadDeChofer(chofer.value);
+		}
+	}, [chofer]);
+
+	const setUnidadDeChofer = async (idUsuario) => {
+		const unidad = await servicioUnidades.otenerUnidadDeChofer(idUsuario);
+		if (unidad?.idUnidadTransporte) {
+			setUnidad({ value: unidad.idUnidadTransporte, label: `${unidad.nombre}` });
+		}
+	};
+
 	const checkErrors = () => {
 		setErrors({
 			chofer: !chofer?.value ? true : false,
@@ -203,7 +216,7 @@ const CrearEditarPedido = () => {
 	return (
 		<Container component="main" maxWidth="sm">
 			<Helmet>
-				<title>Crear pedido</title>
+				<title>{pedido ? 'Modificar pedido' : 'Crear pedido'}</title>
 			</Helmet>
 			<CssBaseline />
 			<Paper
@@ -251,17 +264,17 @@ const CrearEditarPedido = () => {
 								setOnChange={(e) => setTipoPedido(e)}
 								styleInputLabel={{ mt: 2 }}
 							/>
-							{console.log(tipoPedido)}
+
 							{tipoPedido && tipoPedido.pesoDesde && (
 								<Box sx={{ mt: 1 }}>
 									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
-										Peso desde: <Chip size="small" label={tipoPedido.pesoDesde + ' km'} />
-									</Typography>
-									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
-										Peso hasta: <Chip size="small" label={tipoPedido.pesoHasta + ' km'} />
-									</Typography>
-									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
 										Tarifa: <Chip size="small" label={'$ ' + tipoPedido.tarifa} />
+									</Typography>
+									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
+										Peso desde: <Chip size="small" label={tipoPedido.pesoDesde + ' kg'} />
+									</Typography>
+									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
+										Peso hasta: <Chip size="small" label={tipoPedido.pesoHasta + ' kg'} />
 									</Typography>
 								</Box>
 							)}
@@ -275,8 +288,8 @@ const CrearEditarPedido = () => {
 								styles={customStyles}
 								styleInputLabel={{ mt: 2 }}
 							/>
-							<InputLabel sx={{ mt: 2 }}>Direccion</InputLabel>
-							{/* {console.log(direccion.lat ?)} */}
+							<InputLabel sx={{ mt: 2 }}>Dirección</InputLabel>
+
 							{!direccion?.nombre ? (
 								showMap ? (
 									<GooglePlacesAutocomplete
@@ -307,7 +320,7 @@ const CrearEditarPedido = () => {
 								<GoogleApiWrapper markerPos={direccion}></GoogleApiWrapper>
 							</Grid>
 
-							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+							<Grid item xs={12} sm={6}>
 								<TextField
 									InputLabelProps={{
 										classes: {
@@ -318,7 +331,7 @@ const CrearEditarPedido = () => {
 									variant="outlined"
 									fullWidth
 									id="descripcion"
-									label="Descripcion"
+									label="Descripción"
 									value={formik.values.descripcion}
 									onChange={formik.handleChange}
 									error={formik.touched.descripcion && Boolean(formik.errors.descripcion)}

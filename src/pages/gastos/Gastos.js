@@ -135,33 +135,33 @@ export default Gastos;
 
 const cols = [
 	{
-		name: 'Descripcion',
+		name: 'Descripción',
 		selector: (row) => `${row.descripcion}`,
-		sortable: true,
+		sortable: false,
 		grow: 1,
 	},
 	{
 		name: 'Usuario',
 		selector: (row) => `${row.usuario.nombre} ${row.usuario.apellido}`,
-		sortable: true,
+		sortable: false,
 		grow: 1,
 	},
 	{
 		name: 'Unidad',
 		selector: (row) => row.transporte.nombre,
-		sortable: true,
+		sortable: false,
 		grow: 1,
 	},
 	{
 		name: 'Fecha',
-		selector: (row) => `${new Date(row.fecha).toLocaleDateString('es-ES', { year:"numeric", month:"numeric", day:"numeric"})}`,
-		sortable: true,
+		selector: (row) => `${new Date(row.fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}`,
+		sortable: false,
 		grow: 1,
 	},
 	{
 		name: 'Costo',
 		selector: (row) => row.costo,
-		sortable: true,
+		sortable: false,
 		grow: 1,
 	},
 ];

@@ -56,7 +56,7 @@ const CrearEditarTipoPedido = () => {
 	return (
 		<Container component="main" maxWidth="sm">
 			<Helmet>
-				<title>Crear Tipo de Pedido</title>
+				<title>{tipoPedido ? 'Modificar Tipo de Pedido' : 'Crear Tipo de Pedido'}</title>
 			</Helmet>
 			<CssBaseline />
 			<Paper

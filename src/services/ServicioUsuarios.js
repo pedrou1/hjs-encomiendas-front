@@ -12,6 +12,15 @@ export const obtenerUsuarios = async (params) => {
 	} catch (err) {}
 };
 
+export const obtenerUsuariosYCantidadPedidos = async (params) => {
+	try {
+		const res = await http.get(`${url}/cantidad/pedidos`, { params });
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
 export const obtenerUsuario = async (idUsuario) => {
 	try {
 		const res = await http.get(`${url}/${idUsuario}`);

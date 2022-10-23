@@ -40,7 +40,7 @@ export default function Filtros({ children, anchorEl, setAnchorEl }) {
 					horizontal: 'right',
 				}}
 			>
-				<div style={{ minWidth: '300px' }} className="p-3">
+				<div style={{ minWidth: '300px' }} className="p-3 pb-0">
 					{children}
 				</div>
 			</Popover>

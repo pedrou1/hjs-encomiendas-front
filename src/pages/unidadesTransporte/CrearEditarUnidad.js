@@ -55,7 +55,7 @@ const CrearEditarUnidad = () => {
 					const unidadIngresada = { ...values, idChofer: chofer.value, idUnidadTransporte: unidad?.idUnidadTransporte };
 
 					const res = unidad ? await servicioUnidades.modificarUnidad(unidadIngresada) : await servicioUnidades.registrarUnidad(unidadIngresada);
-					console.log(res);
+
 					if (res.operationResult == Constantes.SUCCESS) {
 						navigate('/unidades');
 						toast.success(`Unidad ${unidad ? 'modificada' : 'creada'} correctamente`);
@@ -94,7 +94,7 @@ const CrearEditarUnidad = () => {
 	return (
 		<Container component="main" maxWidth="sm">
 			<Helmet>
-				<title>Crear Unidad de Transporte</title>
+				<title>{unidad ? 'Modificar Unidad de Transporte' : 'Crear Unidad de Transporte'}</title>
 			</Helmet>
 			<CssBaseline />
 			<Paper
@@ -237,7 +237,7 @@ const CrearEditarUnidad = () => {
 									variant="outlined"
 									fullWidth
 									id="padron"
-									label="Padron"
+									label="Padrón"
 									autoFocus
 									value={formik.values.padron}
 									onChange={formik.handleChange}
@@ -257,7 +257,7 @@ const CrearEditarUnidad = () => {
 									variant="outlined"
 									fullWidth
 									id="matricula"
-									label="Matricula"
+									label="Matrícula"
 									autoFocus
 									value={formik.values.matricula}
 									onChange={formik.handleChange}

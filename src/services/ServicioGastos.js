@@ -22,7 +22,6 @@ export const obtenerGasto = async (idGasto) => {
 
 export const eliminarGasto = async (idGasto) => {
 	try {
-		console.log(idGasto);
 		const res = await http.delete(`${url}/${idGasto}`);
 		if (res.status == 200) {
 			return res.data;
@@ -31,7 +30,6 @@ export const eliminarGasto = async (idGasto) => {
 };
 
 export const registrarGasto = async (gasto) => {
-	console.log(gasto);
 	try {
 		const res = await http.post(url + '/crear', gasto);
 		if (res.status == 200) {

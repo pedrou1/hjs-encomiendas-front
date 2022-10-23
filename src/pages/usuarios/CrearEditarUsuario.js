@@ -70,7 +70,7 @@ const CrearEditarUsuario = () => {
 	return (
 		<Container component="main" maxWidth="sm">
 			<Helmet>
-				<title>Crear usuario</title>
+				<title>{usuario ? 'Modificar usuario' : 'Crear usuario'}</title>
 			</Helmet>
 			<CssBaseline />
 			<Paper
@@ -160,6 +160,12 @@ const CrearEditarUsuario = () => {
 									fullWidth
 									id="telefono"
 									label="Teléfono"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
+									type="number"
 									autoFocus
 									value={formik.values.telefono}
 									onChange={formik.handleChange}
@@ -180,49 +186,17 @@ const CrearEditarUsuario = () => {
 									fullWidth
 									id="telefono2"
 									label="Teléfono secundario"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
+									type="number"
 									autoFocus
 									value={formik.values.telefono2}
 									onChange={formik.handleChange}
 									error={formik.touched.telefono2 && Boolean(formik.errors.telefono2)}
 									helperText={formik.touched.telefono2 && formik.errors.telefono2}
-								/>
-							</Grid>
-
-							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-								<TextField
-									InputLabelProps={{
-										classes: {
-											root: classes.label,
-										},
-									}}
-									name="apartamento"
-									variant="outlined"
-									fullWidth
-									id="apartamento"
-									label="Apartamento"
-									value={formik.values.apartamento}
-									onChange={formik.handleChange}
-									error={formik.touched.apartamento && Boolean(formik.errors.apartamento)}
-									helperText={formik.touched.apartamento && formik.errors.apartamento}
-								/>
-							</Grid>
-
-							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-								<TextField
-									InputLabelProps={{
-										classes: {
-											root: classes.label,
-										},
-									}}
-									name="nroPuerta"
-									variant="outlined"
-									fullWidth
-									id="nroPuerta"
-									label="Numero de puerta"
-									value={formik.values.nroPuerta}
-									onChange={formik.handleChange}
-									error={formik.touched.nroPuerta && Boolean(formik.errors.nroPuerta)}
-									helperText={formik.touched.nroPuerta && formik.errors.nroPuerta}
 								/>
 							</Grid>
 
@@ -245,6 +219,45 @@ const CrearEditarUsuario = () => {
 									helperText={formik.touched.direccion && formik.errors.direccion}
 								/>
 							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="apartamento"
+									variant="outlined"
+									fullWidth
+									id="apartamento"
+									label="Apartamento"
+									value={formik.values.apartamento}
+									onChange={formik.handleChange}
+									error={formik.touched.apartamento && Boolean(formik.errors.apartamento)}
+									helperText={formik.touched.apartamento && formik.errors.apartamento}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="nroPuerta"
+									variant="outlined"
+									fullWidth
+									id="nroPuerta"
+									label="Número de puerta"
+									value={formik.values.nroPuerta}
+									onChange={formik.handleChange}
+									error={formik.touched.nroPuerta && Boolean(formik.errors.nroPuerta)}
+									helperText={formik.touched.nroPuerta && formik.errors.nroPuerta}
+								/>
+							</Grid>
+
 							<Grid item xs={12}>
 								<TextField
 									select
@@ -345,8 +358,14 @@ const validationSchema = yup.object({
 	nombre: yup.string('Introduce tu nombre').min(4, 'El nombre debe tener una longitud mínima de 4 caracteres').required('Introduce tu nombre'),
 	apellido: yup.string('Introduce tu apellido').min(4, 'El apellido debe tener una longitud mínima de 4 caracteres').required('Introduce tu apellido'),
 	email: yup.string('Introduce tu email').email('Formato incorrecto'),
-	telefono: yup.string('Introduce tu teléfono').min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres'),
-	telefono2: yup.string('Introduce tu teléfono').min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres'),
+	telefono: yup
+		.string('Introduce tu teléfono')
+		.min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres')
+		.max(15, 'El teléfono debe tener una longitud máxima de 15 caracteres'),
+	telefono2: yup
+		.string('Introduce tu teléfono')
+		.min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres')
+		.max(20, 'El teléfono debe tener una longitud máxima de 15 caracteres'),
 	apartamento: yup.string('Introduce tu apartamento').min(4, 'El apartamento debe tener una longitud mínima de 4 caracteres'),
 	nroPuerta: yup.string('Introduce tu número de puerta'),
 	direccion: yup.string('Introduce tu dirección').min(4, 'La dirección debe tener una longitud mínima de 4 caracteres'),

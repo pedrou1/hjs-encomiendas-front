@@ -22,7 +22,6 @@ export const obtenerTipoPedido = async (idTipoPedido) => {
 
 export const eliminarTipoPedido = async (idTipoPedido) => {
 	try {
-		console.log(idTipoPedido);
 		const res = await http.delete(`${url}/${idTipoPedido}`);
 		if (res.status == 200) {
 			return res.data;

@@ -10,9 +10,7 @@ export class MapContainer extends Component {
 		markers: null,
 	};
 
-	clickMarker = (props, marker) => {
-		console.log(props.placeId);
-	};
+	clickMarker = (props, marker) => {};
 
 	render() {
 		if (!this.props.loaded) return <div>Cargando...</div>;

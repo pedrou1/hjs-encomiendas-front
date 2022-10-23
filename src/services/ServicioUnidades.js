@@ -22,7 +22,6 @@ export const obtenerUnidad = async (idUnidad) => {
 
 export const eliminarUnidad = async (idUnidad) => {
 	try {
-		console.log(idUnidad);
 		const res = await http.delete(`${url}/${idUnidad}`);
 		if (res.status == 200) {
 			return res.data;

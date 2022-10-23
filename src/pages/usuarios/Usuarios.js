@@ -11,24 +11,40 @@ import SearchIcon from '@mui/icons-material/Search';
 import Select from 'react-select';
 import Filtros from './../../components/Filtros';
 import * as Constantes from '../../utils/constantes';
+import { columnasUsuarios } from '../../utils/columnasTablas';
 
 const Usuarios = () => {
 	const [usuarios, setUsuarios] = useState([]);
 	const [countUsuarios, setCountUsuarios] = useState(0);
-	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
 	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [filtro, setFiltro] = useState(null);
 	const [openFiltros, setOpenFiltros] = useState(null);
-	const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState([Constantes.categoriasUsuarios[0]]);
+	const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState([]);
+	const [globalParams, setGlobalParams] = useState({ PageIndex: 0, PageSize: 10 });
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		getUsuarios();
 	}, []);
 
-	const getUsuarios = async (newPaginationData) => {
-		if (newPaginationData) setPaginationData(newPaginationData);
-		const { usuarios, totalRows, operationResult } = await servicioUsuarios.obtenerUsuarios(newPaginationData || paginationData);
+	const getUsuarios = async (newPaginationData, newParams, buscando) => {
+		let params = globalParams;
+		if (newPaginationData) {
+			params.PageIndex = newPaginationData.PageIndex;
+			params.PageSize = newPaginationData.PageSize;
+		}
+
+		if (newParams != null || newParams != undefined) {
+			params.categorias = newParams.categorias;
+		} else {
+			if (!newPaginationData && !buscando) params.categorias = null;
+		}
+
+		if (filtro) params.filters = JSON.stringify(filtro.trim().split(/\s+/));
+		else params.filters = undefined;
+
+		const { usuarios, totalRows, operationResult } = await servicioUsuarios.obtenerUsuarios(params);
+		setGlobalParams(params);
 		setUsuarios(usuarios);
 		setCountUsuarios(totalRows);
 		setLoadingFinished(operationResult == 1 ? true : false);
@@ -42,20 +58,8 @@ const Usuarios = () => {
 		navigate(`/usuario/${row.idUsuario}`);
 	};
 
-	const getUsuariosBusqueda = async () => {
-		const params = paginationData;
-
-		if (filtro) params.filters = JSON.stringify(filtro.trim().split(/\s+/));
-		else params.filters = undefined;
-		const { usuarios, totalRows, operationResult } = await servicioUsuarios.obtenerUsuarios(paginationData);
-
-		setUsuarios(usuarios);
-		setCountUsuarios(totalRows);
-		setLoadingFinished(operationResult == 1 ? true : false);
-	};
-
 	useEffect(() => {
-		getUsuariosBusqueda();
+		getUsuarios(null, null, true);
 	}, [filtro]);
 
 	const customStyles = {
@@ -69,8 +73,13 @@ const Usuarios = () => {
 	};
 
 	const handleFiltrar = async () => {
-		// const categoriasParsed = categoriasSeleccionadas.map((e) => e.value);
-		// getPedidos(null, categoriasParsed);
+		const categoriasParsed = categoriasSeleccionadas.map((e) => e.value);
+		let params = { categorias: null };
+
+		if (categoriasParsed && categoriasParsed.length) {
+			params.categorias = JSON.stringify(categoriasParsed);
+		}
+		getUsuarios(null, params);
 	};
 
 	return (
@@ -99,14 +108,14 @@ const Usuarios = () => {
 				</div>
 				<Table
 					data={usuarios}
-					columns={columnas}
+					columns={columnasUsuarios}
 					totalRows={countUsuarios}
 					isLoadingFinished={loadingFinished}
 					onPageChange={onPageChange}
 					onRowClicked={goToVerUsuario}
 				>
 					<Grid item xs={3} lg={3} className="d-flex justify-content-between">
-						<div className="px-3 pt-3">
+						<div className="px-3 pt-4">
 							<TextField
 								id="input-with-icon-textfield"
 								value={filtro}
@@ -123,14 +132,14 @@ const Usuarios = () => {
 								variant="standard"
 							/>
 						</div>
-						<div className="pt-3">
+						<div className="pt-4" style={{ marginRight: '8.5rem' }}>
 							<h4>Usuarios</h4>
 						</div>
 
 						<div className="align-self-end">
 							<Filtros anchorEl={openFiltros} setAnchorEl={setOpenFiltros}>
 								<Typography>Filtros</Typography>
-								<InputLabel sx={{ mt: 2 }}>Categoria</InputLabel>
+								<InputLabel sx={{ mt: 1 }}>Categoría</InputLabel>
 
 								<Select
 									menuPortalTarget={document.querySelector('.MuiPaper-elevation')}
@@ -142,19 +151,35 @@ const Usuarios = () => {
 									noOptionsMessage={() => 'No hay mas datos'}
 									placeholder={''}
 								/>
-
-								<Button
-									onClick={() => {
-										handleFiltrar();
-										setOpenFiltros(false);
-									}}
-									disabled={!categoriasSeleccionadas.length}
-									variant="contained"
-									className="mt-2"
-									style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
-								>
-									Filtrar
-								</Button>
+								<div className="mt-2 pb-1  d-flex justify-content-start">
+									<div className="mr-2">
+										<Button
+											onClick={() => {
+												handleFiltrar();
+												setOpenFiltros(false);
+											}}
+											variant="contained"
+											className="mt-2"
+											style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+										>
+											Filtrar
+										</Button>
+									</div>
+									<div className="pb-1" style={{ marginLeft: '0.6rem' }}>
+										<Button
+											onClick={() => {
+												setCategoriasSeleccionadas([]);
+												setOpenFiltros(false);
+												getUsuarios();
+											}}
+											variant="outlined"
+											className="mt-2 ml-2"
+											style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
+										>
+											Limpiar
+										</Button>
+									</div>
+								</div>
 							</Filtros>
 						</div>
 					</Grid>
@@ -165,52 +190,3 @@ const Usuarios = () => {
 };
 
 export default Usuarios;
-
-const columnas = [
-	{
-		name: 'Nombre',
-		selector: (row) => row.nombre,
-		sortable: true,
-		grow: 1,
-	},
-	{
-		name: 'Apellido',
-		selector: (row) => row.apellido,
-		sortable: true,
-		grow: 1,
-	},
-	{
-		name: 'Telefono',
-		selector: (row) => row.telefono,
-		sortable: true,
-		grow: 1,
-		cell: (row) => (row.telefono ? row.telefono : <div>-</div>),
-	},
-	{
-		name: 'Email',
-		selector: (row) => row.email,
-		sortable: true,
-		grow: 1,
-		cell: (row) => (row.email ? row.email : <div>-</div>),
-	},
-	{
-		name: 'Usuario',
-		selector: (row) => row.usuario,
-		sortable: true,
-		grow: 1.5,
-	},
-	{
-		name: 'Tipo',
-		selector: (row) => row?.categoriaUsuario?.nombre,
-		sortable: true,
-		grow: 1,
-		cell: (row) => (row?.categoriaUsuario?.nombre ? row?.categoriaUsuario?.nombre : <div>-</div>),
-	},
-	{
-		name: 'Dirección',
-		selector: (row) => row?.direccion,
-		sortable: true,
-		grow: 1,
-		cell: (row) => (row?.direccion ? row?.direccion.substring(0, 30) : <div>-</div>),
-	},
-];
