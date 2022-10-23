@@ -55,14 +55,21 @@ export const columnasPedidos = [
 
 export const columnasUsuarios = [
 	{
-		name: 'Nombre',
+		name: 'Nombre/Razón Social',
 		selector: (row) => row.nombre,
+		sortable: false,
+		grow: 1.3,
+		cell: (row) => <div>{row.nombre}</div>,
+	},
+	{
+		name: 'Apellido',
+		selector: (row) => (row?.ci ? row?.apellido : '-'),
 		sortable: false,
 		grow: 1,
 	},
 	{
-		name: 'Apellido',
-		selector: (row) => row.apellido,
+		name: 'Ci/Rut',
+		selector: (row) => (row?.ci ? row?.ci : row?.rut),
 		sortable: false,
 		grow: 1,
 	},

@@ -39,6 +39,19 @@ const CrearEditarGasto = () => {
 		}
 	}, []);
 
+	useEffect(() => {
+		if (usuario.value) {
+			setUnidadDeChofer(usuario.value);
+		}
+	}, [usuario]);
+
+	const setUnidadDeChofer = async (idUsuario) => {
+		const unidad = await servicioUnidades.otenerUnidadDeChofer(idUsuario);
+		if (unidad?.idUnidadTransporte) {
+			setUnidad({ value: unidad.idUnidadTransporte, label: `${unidad.nombre}` });
+		}
+	};
+
 	const checkErrors = () => {
 		setErrors({
 			usuario: !usuario?.value ? true : false,

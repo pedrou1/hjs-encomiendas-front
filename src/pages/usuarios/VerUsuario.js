@@ -28,7 +28,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import es from 'date-fns/locale/es';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import SelectPaginate from '../../components/SelectPaginate';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
 
 const estados = Constantes.estados;
 
@@ -197,6 +197,12 @@ const VerUsuario = () => {
 												<UserInfoText>
 													<PersonOutlineOutlinedIcon />
 													<Typography variant="body1">{usuario.usuario}</Typography>
+												</UserInfoText>
+											)}
+											{(usuario.ci || usuario.rut) && (
+												<UserInfoText>
+													<FingerprintIcon />
+													<Typography variant="body1">{usuario.ci ? usuario.ci + ' (CI)' : usuario.rut + ' (RUT)'}</Typography>
 												</UserInfoText>
 											)}
 											{usuario.telefono && (
