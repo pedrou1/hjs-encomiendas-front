@@ -46,6 +46,8 @@ const CrearEditarUsuario = () => {
 
 		onSubmit: async (values, e) => {
 			try {
+				values.telefono = values.telefono ? values.telefono.toString() : null;
+				values.telefono2 = values.telefono2 ? values.telefono2.toString() : null;
 				const usuarioIngresado = { ...values, idUsuario: usuario?.idUsuario, categoriaUsuario: { idCategoria: values.categoriaUsuario } };
 
 				const res = usuario ? await servicioUsuarios.modificarUsuario(usuarioIngresado) : await servicioUsuarios.registrarUsuario(usuarioIngresado);
@@ -78,6 +80,7 @@ const CrearEditarUsuario = () => {
 					...defaultStyles.boxShadow,
 					paddingX: 6,
 					paddingY: 2,
+					marginBottom: 6,
 				}}
 			>
 				<Box
@@ -160,15 +163,17 @@ const CrearEditarUsuario = () => {
 									fullWidth
 									id="telefono"
 									label="Teléfono"
+									value={formik.values.telefono}
+									onChange={(event) => {
+										if (isFinite(event.target.value)) {
+											formik.handleChange(event);
+										}
+									}}
 									onKeyPress={(event) => {
 										if (!/[0-9]/.test(event.key)) {
 											event.preventDefault();
 										}
 									}}
-									type="number"
-									autoFocus
-									value={formik.values.telefono}
-									onChange={formik.handleChange}
 									error={formik.touched.telefono && Boolean(formik.errors.telefono)}
 									helperText={formik.touched.telefono && formik.errors.telefono}
 								/>
@@ -191,10 +196,12 @@ const CrearEditarUsuario = () => {
 											event.preventDefault();
 										}
 									}}
-									type="number"
-									autoFocus
+									onChange={(event) => {
+										if (isFinite(event.target.value)) {
+											formik.handleChange(event);
+										}
+									}}
 									value={formik.values.telefono2}
-									onChange={formik.handleChange}
 									error={formik.touched.telefono2 && Boolean(formik.errors.telefono2)}
 									helperText={formik.touched.telefono2 && formik.errors.telefono2}
 								/>
@@ -212,7 +219,6 @@ const CrearEditarUsuario = () => {
 									fullWidth
 									id="direccion"
 									label="Dirección"
-									autoFocus
 									value={formik.values.direccion}
 									onChange={formik.handleChange}
 									error={formik.touched.direccion && Boolean(formik.errors.direccion)}
@@ -295,7 +301,6 @@ const CrearEditarUsuario = () => {
 									fullWidth
 									id="usuario"
 									label="Usuario"
-									autoFocus
 									value={formik.values.usuario}
 									onChange={formik.handleChange}
 									error={formik.touched.usuario && Boolean(formik.errors.usuario)}

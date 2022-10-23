@@ -151,6 +151,7 @@ const CrearEditarGasto = () => {
 								name="descripcion"
 								variant="outlined"
 								fullWidth
+								autoFocus
 								id="descripcion"
 								label="Descripción"
 								value={formik.values.descripcion}

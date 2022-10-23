@@ -30,7 +30,7 @@ const CrearEditarUnidad = () => {
 		initialValues: unidad
 			? {
 					nombre: unidad.nombre,
-					promedioConsumo: unidad.promedioConsumo,
+					promedioConsumo: unidad.promedioConsumo ? unidad.promedioConsumo : '',
 					marca: unidad.marca ? unidad.marca : '',
 					modelo: unidad.modelo ? unidad.modelo : '',
 					anio: unidad.anio ? unidad.anio : 0,
@@ -52,6 +52,9 @@ const CrearEditarUnidad = () => {
 			try {
 				checkErrors();
 				if (chofer.value) {
+					if (values.anio == '') {
+						values.anio = 0;
+					}
 					const unidadIngresada = { ...values, idChofer: chofer.value, idUnidadTransporte: unidad?.idUnidadTransporte };
 
 					const res = unidad ? await servicioUnidades.modificarUnidad(unidadIngresada) : await servicioUnidades.registrarUnidad(unidadIngresada);
@@ -102,6 +105,7 @@ const CrearEditarUnidad = () => {
 					...defaultStyles.boxShadow,
 					paddingX: 6,
 					paddingY: 2,
+					marginY: 2,
 				}}
 			>
 				<Box
@@ -143,37 +147,11 @@ const CrearEditarUnidad = () => {
 											root: classes.label,
 										},
 									}}
-									type="number"
-									onKeyPress={(event) => {
-										if (!/[0-9]/.test(event.key)) {
-											event.preventDefault();
-										}
-									}}
-									name="promedioConsumo"
-									variant="outlined"
-									fullWidth
-									id="promedioConsumo"
-									label="Promedio de Consumo"
-									value={formik.values.promedioConsumo}
-									onChange={formik.handleChange}
-									error={formik.touched.promedioConsumo && Boolean(formik.errors.promedioConsumo)}
-									helperText={formik.touched.promedioConsumo && formik.errors.promedioConsumo}
-								/>
-							</Grid>
-
-							<Grid item xs={12} sm={6}>
-								<TextField
-									InputLabelProps={{
-										classes: {
-											root: classes.label,
-										},
-									}}
 									name="marca"
 									variant="outlined"
 									fullWidth
 									id="marca"
 									label="Marca"
-									autoFocus
 									value={formik.values.marca}
 									onChange={formik.handleChange}
 									error={formik.touched.marca && Boolean(formik.errors.marca)}
@@ -193,7 +171,6 @@ const CrearEditarUnidad = () => {
 									fullWidth
 									id="modelo"
 									label="Modelo"
-									autoFocus
 									value={formik.values.modelo}
 									onChange={formik.handleChange}
 									error={formik.touched.modelo && Boolean(formik.errors.modelo)}
@@ -238,7 +215,6 @@ const CrearEditarUnidad = () => {
 									fullWidth
 									id="padron"
 									label="Padrón"
-									autoFocus
 									value={formik.values.padron}
 									onChange={formik.handleChange}
 									error={formik.touched.padron && Boolean(formik.errors.padron)}
@@ -258,7 +234,6 @@ const CrearEditarUnidad = () => {
 									fullWidth
 									id="matricula"
 									label="Matrícula"
-									autoFocus
 									value={formik.values.matricula}
 									onChange={formik.handleChange}
 									error={formik.touched.matricula && Boolean(formik.errors.matricula)}
@@ -266,7 +241,7 @@ const CrearEditarUnidad = () => {
 								/>
 							</Grid>
 
-							<Grid className="text-start" item xs={12} sm={8}>
+							<Grid className="text-start mb-3" item xs={12} sm={8}>
 								<SelectPaginate
 									label="Chofer"
 									errorLabel={errors.chofer ? 'Ingrese un chofer' : ''}
@@ -309,7 +284,6 @@ const useStyles = () => ({
 
 const validationSchema = yup.object({
 	nombre: yup.string('Introduce el nombre').min(4, 'El nombre debe tener una longitud mínima de 4 caracteres').required('Introduce el nombre'),
-	promedioConsumo: yup.number('Introduce el promedio consumo').min(0).required('Introduce el promedio consumo'),
 });
 
 export default CrearEditarUnidad;

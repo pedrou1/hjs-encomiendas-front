@@ -24,7 +24,7 @@ const RegistrarUsuario = () => {
 		validationSchema: validationSchema,
 
 		onSubmit: async (values, e) => {
-			const val = { ...values, categoriaUsuario: { idCategoria: Constantes.ID_ADMINISTRADOR } }; //FIXME: cambiar a cliente
+			const val = { ...values, categoriaUsuario: { idCategoria: Constantes.ID_CLIENTE } };
 			const res = await servicioUsuarios.registrarUsuario(val);
 
 			if (res.operationResult == Constantes.SUCCESS) {

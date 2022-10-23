@@ -64,6 +64,7 @@ const CrearEditarTipoPedido = () => {
 					...defaultStyles.boxShadow,
 					paddingX: 6,
 					paddingY: 2,
+					marginY: 2,
 				}}
 			>
 				<Box
@@ -178,6 +179,7 @@ const CrearEditarTipoPedido = () => {
 								display: 'flex',
 								flexDirection: 'column',
 								alignItems: 'center',
+								marginTop: 1,
 							}}
 						>
 							<div className="align-self-end">

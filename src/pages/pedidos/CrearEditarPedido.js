@@ -265,7 +265,7 @@ const CrearEditarPedido = () => {
 								styleInputLabel={{ mt: 2 }}
 							/>
 
-							{tipoPedido && tipoPedido.pesoDesde && (
+							{tipoPedido && tipoPedido.tarifa && (
 								<Box sx={{ mt: 1 }}>
 									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
 										Tarifa: <Chip size="small" label={'$ ' + tipoPedido.tarifa} />
