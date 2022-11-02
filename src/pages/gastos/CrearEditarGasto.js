@@ -1,4 +1,4 @@
-import { Button, TextField, CssBaseline, Box, Grid, Typography, Container, Paper, InputLabel, MenuItem, FormHelperText } from '@mui/material';
+import { Button, TextField, CssBaseline, Box, Grid, Typography, Container, Paper, InputLabel, FormHelperText } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Helmet } from 'react-helmet';
@@ -15,10 +15,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import es from 'date-fns/locale/es';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AsyncPaginate } from 'react-select-async-paginate';
-import Select from 'react-select';
 import SelectPaginate from '../../components/SelectPaginate';
-import * as servicioTipoPedidos from '../../services/ServicioTipoPedidos';
 
 const CrearEditarGasto = () => {
 	const [usuario, setUsuario] = useState({});
@@ -28,14 +25,17 @@ const CrearEditarGasto = () => {
 	const navigate = useNavigate();
 	const { state } = useLocation();
 	const gasto = state?.gasto ? state.gasto : null;
-	const [fecha, setFecha] = useState(gasto?.fecha ? new Date(gasto.fecha) : null);
+	const [fecha, setFecha] = useState(gasto?.fecha ? new Date(gasto.fecha) : new Date());
 
 	useEffect(() => {
 		if (gasto) {
 			const usuario = { value: gasto.usuario.idUsuario, label: `${gasto.usuario.nombre} ${gasto.usuario.apellido}` };
-			const unidad = { value: gasto.transporte.idUnidadTransporte, label: `${gasto.transporte.nombre}` };
+			if (gasto.transporte?.idUnidadTransporte) {
+				const unidad = { value: gasto.transporte.idUnidadTransporte, label: `${gasto.transporte.nombre}` };
+				setUnidad(unidad);
+			}
+
 			setUsuario(usuario);
-			setUnidad(unidad);
 		}
 	}, []);
 
@@ -55,7 +55,7 @@ const CrearEditarGasto = () => {
 	const checkErrors = () => {
 		setErrors({
 			usuario: !usuario?.value ? true : false,
-			unidad: !unidad?.value ? true : false,
+			fecha: !fecha ? true : false,
 		});
 	};
 
@@ -74,12 +74,12 @@ const CrearEditarGasto = () => {
 		onSubmit: async (values, e) => {
 			try {
 				checkErrors();
-				if (usuario.value && unidad.value) {
+				if (usuario.value && fecha) {
 					const gastoIngresado = {
 						...values,
 						idGasto: gasto?.idGasto,
 						idUsuario: usuario.value,
-						idTransporte: unidad.value,
+						idTransporte: unidad?.value ? unidad?.value : undefined,
 						fecha,
 					};
 
@@ -165,6 +165,8 @@ const CrearEditarGasto = () => {
 								variant="outlined"
 								fullWidth
 								autoFocus
+								multiline
+								maxRows={4}
 								id="descripcion"
 								label="Descripción"
 								value={formik.values.descripcion}
@@ -186,7 +188,6 @@ const CrearEditarGasto = () => {
 
 							<SelectPaginate
 								label="Unidad de transporte"
-								errorLabel={errors.unidad ? 'Ingrese una unidad' : ''}
 								value={unidad}
 								loadOptions={loadOptionsUnidad}
 								setOnChange={setUnidad}
@@ -199,6 +200,20 @@ const CrearEditarGasto = () => {
 								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
 									<DatePicker label="Fecha" value={fecha} onChange={(f) => setFecha(f)} renderInput={(params) => <TextField {...params} />} />
 								</LocalizationProvider>
+								{errors.fecha ? (
+									<FormHelperText
+										error={Boolean(true)}
+										sx={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											padding: '0 10px',
+										}}
+									>
+										<span>Ingrese una fecha</span>
+									</FormHelperText>
+								) : (
+									<></>
+								)}
 							</Grid>
 
 							<Grid item xs={12} sm={6} sx={{ mt: 2 }}>
@@ -261,9 +276,10 @@ const useStyles = () => ({
 const validationSchema = yup.object({
 	descripcion: yup
 		.string('Introduce la descripción')
-		.min(4, 'La descripción debe tener una longitud mínima de 100 caracteres')
+		.max(200, 'La descripción debe tener como máximo 200 caracteres')
+		.min(4, 'La descripción debe tener una longitud mínima de 4 caracteres')
 		.required('Introduce la descripción'),
-	costo: yup.number('Introduce el costo').min(0).required('Introduce el costo'),
+	costo: yup.number('Introduce el costo').min(1, 'Introduce el costo').required('Introduce el costo'),
 });
 
 export default CrearEditarGasto;

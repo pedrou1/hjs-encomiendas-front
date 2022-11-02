@@ -21,6 +21,7 @@ import SelectPaginate from '../../components/SelectPaginate';
 import * as servicioTipoPedidos from '../../services/ServicioTipoPedidos';
 import GoogleApiWrapper from './MapComp';
 import GooglePlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-google-places-autocomplete';
+import ModalDialog from '../../components/ModalDialog';
 
 const estados = Constantes.estados;
 
@@ -31,10 +32,12 @@ const CrearEditarPedido = () => {
 	const [estado, setEstado] = useState(estados[0]);
 	const [tipoPedido, setTipoPedido] = useState({});
 	const [errors, setErrors] = useState({});
+	const [openModal, setOpenModal] = useState(false);
 
 	const navigate = useNavigate();
 	const { state } = useLocation();
 	const pedido = state?.pedido ? state.pedido : null;
+	const esReserva = state?.reserva ? state.reserva : null;
 
 	const [showMap, setShowMap] = useState(false);
 
@@ -44,7 +47,7 @@ const CrearEditarPedido = () => {
 
 	useEffect(() => {
 		if (!process.env.REACT_APP_API_GOOGLE) {
-			window.location = '/error';
+			window.location = '#/error';
 		}
 
 		if (pedido) {
@@ -84,6 +87,51 @@ const CrearEditarPedido = () => {
 		});
 	};
 
+	const rechazarPedido = async () => {
+		let pedidoIngresado = parsearPedido(pedido);
+
+		pedidoIngresado = {
+			...pedidoIngresado,
+			chofer: undefined,
+			cliente: undefined,
+			transporte: undefined,
+			reservado: false,
+			activo: false,
+			estado: estados[3].value,
+		};
+
+		if (chofer.value && cliente.value && unidad.value && tipoPedido.value && direccion.lat && estado.value) {
+			const res = await servicioPedidos.modificarPedido(pedidoIngresado);
+			if (res.operationResult == Constantes.SUCCESS) {
+				navigate('/reservas-pedidos');
+				toast.success(`Reserva rechazada correctamente`);
+			} else if (res.operationResult == Constantes.ERROR) {
+				toast.error('Ha ocurrido un error');
+				navigate('/error');
+			}
+		} else {
+			toast.error('Ingrese los datos');
+		}
+	};
+
+	const parsearPedido = (values) => {
+		let pedidoIngresado = {
+			...values,
+			idPedido: pedido?.idPedido,
+			idChofer: chofer.value,
+			idCliente: cliente.value,
+			idTipoPedido: tipoPedido.value,
+			idTransporte: unidad.value,
+			estado: estado.value,
+			longitude: direccion.lng,
+			latitude: direccion.lat,
+			nombreDireccion: direccion.nombre,
+			horaLimite: !isNaN(horaLimite) ? horaLimite : null,
+		};
+
+		return pedidoIngresado;
+	};
+
 	const formik = useFormik({
 		initialValues: pedido
 			? {
@@ -102,25 +150,25 @@ const CrearEditarPedido = () => {
 			try {
 				checkErrors();
 				if (chofer.value && cliente.value && unidad.value && tipoPedido.value && direccion.lat && estado.value) {
-					const pedidoIngresado = {
-						...values,
-						idPedido: pedido?.idPedido,
-						idChofer: chofer.value,
-						idCliente: cliente.value,
-						idTipoPedido: tipoPedido.value,
-						idTransporte: unidad.value,
-						estado: estado.value,
-						longitude: direccion.lng,
-						latitude: direccion.lat,
-						nombreDireccion: direccion.nombre,
-						horaLimite: !isNaN(horaLimite) ? horaLimite : null,
-					};
+					let pedidoIngresado = parsearPedido(values);
+
+					if (esReserva) {
+						pedidoIngresado = {
+							...pedidoIngresado,
+							fechaRetiro: new Date(),
+							reservado: false,
+							activo: true,
+						};
+					}
 
 					const res = pedido ? await servicioPedidos.modificarPedido(pedidoIngresado) : await servicioPedidos.registrarPedido(pedidoIngresado);
 
 					if (res.operationResult == Constantes.SUCCESS) {
 						navigate('/pedidos');
-						toast.success(`Pedido ${pedido ? 'modificado' : 'creado'} correctamente`);
+						let mensaje = pedido ? 'modificado' : 'creado';
+						if (esReserva) mensaje = 'reservado';
+
+						toast.success(`Pedido ${mensaje} correctamente`);
 					} else if (res.operationResult == Constantes.ERROR) {
 						toast.error('Ha ocurrido un error');
 						navigate('/error');
@@ -153,7 +201,7 @@ const CrearEditarPedido = () => {
 		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters, Tipo });
 
 		return {
-			options: [...usuarios.map((u) => ({ value: u.idUsuario, label: `${u.nombre} ${u.apellido}` }))],
+			options: [...usuarios.map((u) => ({ value: u.idUsuario, label: `${u.nombre} ${u.apellido}`, ...u }))],
 			hasMore: loadedOptions.length < totalRows,
 		};
 	}
@@ -215,25 +263,40 @@ const CrearEditarPedido = () => {
 
 	return (
 		<Container component="main" maxWidth="sm">
-			<Helmet>
-				<title>{pedido ? 'Modificar pedido' : 'Crear pedido'}</title>
-			</Helmet>
+			<Helmet>{!esReserva ? <title>{pedido ? 'Modificar pedido' : 'Crear pedido'}</title> : <title>Ver reserva</title>}</Helmet>
 			<CssBaseline />
+			<ModalDialog
+				open={openModal}
+				titulo="Rechazar"
+				mensaje={`¿Quieres rechazar la reserva?`}
+				esEliminar={true}
+				handleClose={() => {
+					setOpenModal(false);
+				}}
+				handleAccept={() => rechazarPedido()}
+			/>
 			<Paper
 				sx={{
 					...defaultStyles.boxShadow,
 					paddingX: 6,
 					paddingY: 2,
+					marginBottom: 2,
 				}}
 			>
 				<Box>
-					<Typography component="h1" variant="h5">
-						{pedido ? 'Editar Pedido' : 'Crear Pedido'}
-					</Typography>
+					{!esReserva ? (
+						<Typography component="h1" variant="h5">
+							{pedido ? 'Editar Pedido' : 'Crear Pedido'}
+						</Typography>
+					) : (
+						<Typography component="h1" variant="h5">
+							Ver reserva
+						</Typography>
+					)}
 					<Box component="form" noValidate onSubmit={formik.handleSubmit} sx={{ mt: 3 }}>
 						<Grid className="text-start">
 							<SelectPaginate
-								label="Chofer"
+								label="Chofer *"
 								errorLabel={errors.chofer ? 'Ingrese un chofer' : ''}
 								value={chofer}
 								loadOptions={loadOptionsChofer}
@@ -241,15 +304,36 @@ const CrearEditarPedido = () => {
 								styleInputLabel={{ mt: 2 }}
 							/>
 							<SelectPaginate
-								label="Cliente"
+								label="Cliente *"
 								errorLabel={errors.cliente ? 'Ingrese un cliente' : ''}
 								value={cliente}
 								loadOptions={loadOptionsCliente}
 								setOnChange={setCliente}
 								styleInputLabel={{ mt: 2 }}
 							/>
+							<div className="mb-1"></div>
+							{cliente?.telefono ? (
+								<Typography variant="span" sx={{ fontWeight: 'normal', m: 1 }}>
+									Tel:
+									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
+										<Chip size="small" label={cliente.telefono} />
+									</Typography>
+								</Typography>
+							) : (
+								<></>
+							)}
+							{cliente?.telefono2 ? (
+								<Typography variant="span" sx={{ fontWeight: 'normal', m: 1 }}>
+									Tel. secundario:
+									<Typography variant="span" sx={{ fontWeight: 'Medium', m: 1 }}>
+										<Chip size="small" label={cliente.telefono2} />
+									</Typography>
+								</Typography>
+							) : (
+								<></>
+							)}
 							<SelectPaginate
-								label="Unidad de transporte"
+								label="Unidad de transporte *"
 								errorLabel={errors.unidad ? 'Ingrese una unidad' : ''}
 								value={unidad}
 								loadOptions={loadOptionsUnidad}
@@ -257,7 +341,7 @@ const CrearEditarPedido = () => {
 								styleInputLabel={{ mt: 2 }}
 							/>
 							<SelectPaginate
-								label="Tipo de Pedido"
+								label="Tipo de Pedido *"
 								errorLabel={errors.tipoPedido ? 'Ingrese un tipo de pedido' : ''}
 								value={tipoPedido}
 								loadOptions={loadOptionTiposPedido}
@@ -288,7 +372,32 @@ const CrearEditarPedido = () => {
 								styles={customStyles}
 								styleInputLabel={{ mt: 2 }}
 							/>
-							<InputLabel sx={{ mt: 2 }}>Dirección</InputLabel>
+							<Box sx={{ mt: 1 }}>
+								{pedido && pedido.fechaRetiro ? (
+									<Typography variant="span" sx={{ fontWeight: 'normal', m: 1, mt: 4 }}>
+										{`Fecha de retiro: ${new Date(pedido.fechaRetiro).toLocaleDateString('es-ES', {
+											year: 'numeric',
+											month: 'numeric',
+											day: 'numeric',
+										})}`}
+									</Typography>
+								) : (
+									<></>
+								)}
+
+								{pedido && pedido.fechaEntrega ? (
+									<Typography variant="span" sx={{ fontWeight: 'normal', m: 1, mt: 4 }}>
+										{`Fecha de entrega: ${new Date(pedido.fechaEntrega).toLocaleDateString('es-ES', {
+											year: 'numeric',
+											month: 'numeric',
+											day: 'numeric',
+										})}`}
+									</Typography>
+								) : (
+									<></>
+								)}
+							</Box>
+							<InputLabel sx={{ mt: 2 }}>Dirección *</InputLabel>
 
 							{!direccion?.nombre ? (
 								showMap ? (
@@ -328,6 +437,8 @@ const CrearEditarPedido = () => {
 										},
 									}}
 									name="descripcion"
+									multiline
+									maxRows={4}
 									variant="outlined"
 									fullWidth
 									id="descripcion"
@@ -380,8 +491,17 @@ const CrearEditarPedido = () => {
 									fullWidth
 									id="nroPuerta"
 									label="Nro. Puerta"
+									onChange={(event) => {
+										if (isFinite(event.target.value)) {
+											formik.handleChange(event);
+										}
+									}}
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
 									value={formik.values.nroPuerta}
-									onChange={formik.handleChange}
 									error={formik.touched.nroPuerta && Boolean(formik.errors.nroPuerta)}
 									helperText={formik.touched.nroPuerta && formik.errors.nroPuerta}
 								/>
@@ -392,15 +512,32 @@ const CrearEditarPedido = () => {
 								display: 'flex',
 								flexDirection: 'column',
 								alignItems: 'center',
+								marginTop: 2,
 							}}
 						>
 							<div className="align-self-end">
-								<Button variant="outlined" color="primary" sx={{ mt: 3, mb: 2 }} className="m-1" component={RouterLink} to={-1}>
-									Cancelar
-								</Button>
-								<Button type="submit" variant="contained" color="primary" sx={{ mt: 3, mb: 2 }} className="m-1">
-									{pedido ? 'Modificar' : 'Crear'}
-								</Button>
+								{!esReserva ? (
+									<>
+										<Button variant="outlined" color="primary" sx={{ mt: 3, mb: 2 }} className="m-1" component={RouterLink} to={-1}>
+											Cancelar
+										</Button>
+										<Button type="submit" variant="contained" color="primary" sx={{ mt: 3, mb: 2 }} className="m-1">
+											{pedido ? 'Modificar' : 'Crear'}
+										</Button>
+									</>
+								) : (
+									<>
+										<Button variant="outlined" color="primary" sx={{ mt: 3, mb: 2 }} className="m-1" component={RouterLink} to={-1}>
+											Atrás
+										</Button>
+										<Button variant="contained" color="error" onClick={() => setOpenModal(true)}>
+											Rechazar
+										</Button>
+										<Button type="submit" variant="contained" color="success" sx={{ mt: 3, mb: 2 }} className="m-1">
+											Crear
+										</Button>
+									</>
+								)}
 							</div>
 						</Box>
 					</Box>
@@ -421,6 +558,9 @@ const useStyles = () => ({
 const validationSchema = yup.object({
 	orden: 0,
 	tipo: 0,
+	descripcion: yup.string().min(4, 'La descripción debe tener al menos 4 caracteres').max(200, 'La descripción no puede superar los 200 caracteres'),
+	nroPuerta: yup.string().max(6, 'El número de puerta no puede superar los 6 caracteres'),
+	apartamento: yup.string().max(100, 'El apartamento no puede superar los 100 caracteres'),
 });
 
 export default CrearEditarPedido;

@@ -1,4 +1,4 @@
-import { Button, CssBaseline, Box, Container, IconButton, InputLabel, Grid, Typography, TextField } from '@mui/material';
+import { Button, CssBaseline, Box, Container, IconButton, InputLabel, Grid, Typography, TextField, Tooltip, Chip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Helmet } from 'react-helmet';
 import { useEffect, useState } from 'react';
@@ -19,6 +19,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import * as servicioUnidades from '../../services/ServicioUnidades';
 import SelectPaginate from '../../components/SelectPaginate';
+import InfoIcon from '@mui/icons-material/Info';
 
 const estados = Constantes.estados;
 
@@ -34,6 +35,7 @@ const Pedidos = () => {
 	const [fechaHasta, setFechaHasta] = useState(null);
 	const [unidadSeleccionada, setUnidadSeleccionada] = useState({});
 	const [globalParams, setGlobalParams] = useState({ PageIndex: 0, PageSize: 10 });
+	const [distanciaRecorridaSeleccionada, setDistanciaRecorridaSeleccionada] = useState(0);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -76,12 +78,13 @@ const Pedidos = () => {
 			}
 		}
 
-		const { pedidos, totalRows, operationResult } = await servicioPedidos.obtenerPedidos(params);
+		const { pedidos, totalRows, distanciaRecorrida, operationResult } = await servicioPedidos.obtenerPedidos(params);
 
 		setGlobalParams(params);
 		setPedidos(pedidos);
 		setCountPedidos(totalRows);
 		setLoadingFinished(operationResult == 1 ? true : false);
+		setDistanciaRecorridaSeleccionada(distanciaRecorrida);
 	};
 
 	const onPageChange = async (paginationData) => {
@@ -119,7 +122,7 @@ const Pedidos = () => {
 		const { unidadesTransporte, totalRows } = await servicioUnidades.obtenerUnidades({ PageIndex: loadedOptions.length, PageSize: 5, filters });
 
 		return {
-			options: [...unidadesTransporte.map((u) => ({ value: u.idUnidadTransporte, label: `${u.nombre}` }))],
+			options: [...unidadesTransporte.map((u) => ({ value: u.idUnidadTransporte, label: `${u.nombre}`, ...u }))],
 			hasMore: loadedOptions.length < totalRows,
 		};
 	}
@@ -198,7 +201,6 @@ const Pedidos = () => {
 					</Button>
 				</div>
 				<Table
-					// title="Pedidos"
 					data={pedidos}
 					columns={columnas}
 					totalRows={countPedidos}
@@ -207,14 +209,38 @@ const Pedidos = () => {
 					onRowClicked={goToVerPedidos}
 				>
 					<Grid item xs={3} lg={3} className="d-flex justify-content-between">
-						<div></div>
-						<div className="pt-4" style={{ marginLeft: '5.5rem' }}>
+						{distanciaRecorridaSeleccionada ? (
+							<Typography className="pt-4" style={{ marginLeft: '1rem' }}>
+								<Chip size="small" label={'Distancia recorrida: ' + Math.round(distanciaRecorridaSeleccionada / 1000) + 'km'} />
+
+								{unidadSeleccionada.promedioConsumo ? (
+									<Chip
+										sx={{ ml: 1 }}
+										size="small"
+										label={`Consumo: ${(distanciaRecorridaSeleccionada / (unidadSeleccionada.promedioConsumo * 1000)).toFixed(2)}L`}
+									/>
+								) : (
+									''
+								)}
+							</Typography>
+						) : (
+							<div></div>
+						)}
+
+						<div className="pt-4" style={{ marginLeft: distanciaRecorridaSeleccionada ? '-4.5rem' : '4.2rem' }}>
 							<h4>Pedidos</h4>
 						</div>
 
 						<div className="align-self-end">
 							<Filtros anchorEl={openFiltros} setAnchorEl={setOpenFiltros}>
-								<Typography>Filtros</Typography>
+								<div className="d-flex align-items-center">
+									<Typography>Filtros</Typography>
+									<Tooltip title="Elige una unidad y un rango de fecha para saber el consumo promedio">
+										<IconButton size="small">
+											<InfoIcon sx={{ fontSize: 20 }} color="disabled" />
+										</IconButton>
+									</Tooltip>
+								</div>
 								<InputLabel sx={{ mt: 1 }}>Estado</InputLabel>
 								<div>
 									<Select
@@ -236,23 +262,24 @@ const Pedidos = () => {
 										menuPortalTargetName={'.MuiPaper-elevation'}
 										stylesCustm={customStyles}
 									/>
-
-									<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
-										<DatePicker
-											label="Fecha desde"
-											value={fechaDesde}
-											onChange={(f) => setFechaDesde(f)}
-											renderInput={(params) => <TextField className="mt-3 w-50" {...params} />}
-										/>
-									</LocalizationProvider>
-									<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
-										<DatePicker
-											label="Fecha hasta"
-											value={fechaHasta}
-											onChange={(f) => setFechaHasta(f)}
-											renderInput={(params) => <TextField className="mt-3 w-50" {...params} />}
-										/>
-									</LocalizationProvider>
+									<div className="d-flex align-items-center">
+										<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+											<DatePicker
+												label="Fecha desde"
+												value={fechaDesde}
+												onChange={(f) => setFechaDesde(f)}
+												renderInput={(params) => <TextField className="mt-3 w-50" style={{ marginRight: '0.4rem' }} {...params} />}
+											/>
+										</LocalizationProvider>
+										<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+											<DatePicker
+												label="Fecha hasta"
+												value={fechaHasta}
+												onChange={(f) => setFechaHasta(f)}
+												renderInput={(params) => <TextField className="mt-3 w-50" {...params} />}
+											/>
+										</LocalizationProvider>
+									</div>
 								</div>
 								<div className="mt-2 pb-1  d-flex justify-content-start">
 									<div className="mr-2">

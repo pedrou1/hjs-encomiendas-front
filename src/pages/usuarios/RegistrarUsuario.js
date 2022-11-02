@@ -46,6 +46,8 @@ const RegistrarUsuario = () => {
 			email: '',
 			usuario: '',
 			password: '',
+			apartamento: '',
+			nroPuerta: '',
 		},
 		validationSchema: validationSchema,
 
@@ -66,7 +68,7 @@ const RegistrarUsuario = () => {
 				} else if (res.operationResult == Constantes.ALREADYEXIST) {
 					e.setFieldError('usuario', 'El usuario ya existe, ingresa otro');
 				} else if (res.operationResult == Constantes.ERROR) {
-					window.location = '/error';
+					window.location = '#/error';
 				}
 			}
 		},
@@ -114,7 +116,7 @@ const RegistrarUsuario = () => {
 									variant="outlined"
 									fullWidth
 									id="nombre"
-									label={esParticular ? 'Nombre' : 'Razón social'}
+									label={esParticular ? 'Nombre *' : 'Razón social *'}
 									autoFocus
 									value={formik.values.nombre}
 									onChange={formik.handleChange}
@@ -158,7 +160,7 @@ const RegistrarUsuario = () => {
 											variant="outlined"
 											fullWidth
 											id="ci"
-											label="Cédula de identidad"
+											label="Cédula de identidad *"
 											value={ci}
 											onKeyPress={(event) => {
 												if (!/[0-9]/.test(event.key)) {
@@ -182,7 +184,7 @@ const RegistrarUsuario = () => {
 											variant="outlined"
 											fullWidth
 											id="rut"
-											label="RUT"
+											label="RUT *"
 											value={rut}
 											onKeyPress={(event) => {
 												if (!/[0-9]/.test(event.key)) {
@@ -245,7 +247,7 @@ const RegistrarUsuario = () => {
 									variant="outlined"
 									fullWidth
 									id="telefono"
-									label="Teléfono"
+									label="Teléfono *"
 									autoFocus
 									onKeyPress={(event) => {
 										if (!/[0-9]/.test(event.key)) {
@@ -289,11 +291,58 @@ const RegistrarUsuario = () => {
 											root: classes.label,
 										},
 									}}
+									name="apartamento"
+									variant="outlined"
+									fullWidth
+									id="apartamento"
+									label="Apartamento"
+									value={formik.values.apartamento}
+									onChange={formik.handleChange}
+									error={formik.touched.apartamento && Boolean(formik.errors.apartamento)}
+									helperText={formik.touched.apartamento && formik.errors.apartamento}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="nroPuerta"
+									variant="outlined"
+									fullWidth
+									id="nroPuerta"
+									label="Número de puerta"
+									value={formik.values.nroPuerta}
+									onChange={(event) => {
+										if (isFinite(event.target.value)) {
+											formik.handleChange(event);
+										}
+									}}
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
+									error={formik.touched.nroPuerta && Boolean(formik.errors.nroPuerta)}
+									helperText={formik.touched.nroPuerta && formik.errors.nroPuerta}
+								/>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
 									name="usuario"
 									variant="outlined"
 									fullWidth
 									id="usuario"
-									label="Usuario"
+									label="Usuario *"
 									autoFocus
 									value={formik.values.usuario}
 									onChange={formik.handleChange}
@@ -312,7 +361,7 @@ const RegistrarUsuario = () => {
 									variant="outlined"
 									fullWidth
 									id="password"
-									label="Contraseña"
+									label="Contraseña *"
 									type="password"
 									value={formik.values.password}
 									onChange={formik.handleChange}
@@ -352,20 +401,34 @@ const validationSchema = yup.object({
 	nombre: yup
 		.string('Introduce tu nombre/razón social')
 		.min(4, 'El nombre/razón social debe tener una longitud mínima de 4 caracteres')
+		.max(100, 'El nombre/razón social debe tener una longitud máxima de 100 caracteres')
 		.required('Introduce tu nombre/razón social'),
-	apellido: yup.string('Introduce tu apellido').nullable(),
-	email: yup.string('Introduce tu email').email('Formato incorrecto'),
+	apellido: yup.string('Introduce tu apellido').nullable().max(100, 'El apellido debe tener una longitud máxima de 100 caracteres'),
+	email: yup.string('Introduce tu email').email('Formato incorrecto').max(150, 'El email debe tener una longitud máxima de 150 caracteres'),
 	telefono: yup
 		.string('Introduce tu teléfono')
-		.nullable()
+		.required('Introduce tu teléfono')
 		.min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres')
 		.max(15, 'El teléfono debe tener una longitud máxima de 15 caracteres'),
-	direccion: yup.string('Introduce tu dirección').min(4, 'La dirección debe tener una longitud mínima de 4 caracteres'),
+	direccion: yup
+		.string('Introduce tu dirección')
+		.min(4, 'La dirección debe tener una longitud mínima de 4 caracteres')
+		.max(200, 'La dirección debe tener una longitud máxima de 200 caracteres'),
 	usuario: yup
 		.string('Introduce tu nombre de usuario')
 		.min(4, 'El nombre de usuario debe tener una longitud mínima de 4 caracteres')
+		.max(100, 'El nombre de usuario debe tener una longitud máxima de 100 caracteres')
 		.required('Introduce tu nombre de usuario'),
-	password: yup.string('Introduce tu contraseña').min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres').required('Introduce tu contraseña'),
+	password: yup
+		.string('Introduce tu contraseña')
+		.min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres')
+		.max(80, 'La contraseña debe tener una longitud máxima de 80 caracteres')
+		.required('Introduce tu contraseña'),
+	apartamento: yup
+		.string('Introduce el apartamento')
+		.min(4, 'El apartamento debe tener una longitud mínima de 4 caracteres')
+		.max(100, 'El apartamento no puede superar los 100 caracteres'),
+	nroPuerta: yup.string('Introduce el número de puerta').max(6, 'El número de puerta no puede superar los 6 caracteres'),
 });
 
 export default RegistrarUsuario;

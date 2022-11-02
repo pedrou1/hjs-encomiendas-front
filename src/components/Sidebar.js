@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
 import { Drawer, List } from '@mui/material';
-import { PeopleAlt as UsersIcon, ListAlt as PedidosIcon, LocalShipping as TransporteIcon, MonetizationOn as GastoIcon, BarChart, Title } from '@mui/icons-material';
+import {
+	PeopleAlt as UsersIcon,
+	ListAlt as PedidosIcon,
+	LocalShipping as TransporteIcon,
+	MonetizationOn as GastoIcon,
+	BarChart,
+	Title,
+} from '@mui/icons-material';
 import { useLocation } from 'react-router-dom';
 import SidebarLink from './SidebarLink';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 
 function Sidebar() {
 	let location = useLocation();
@@ -51,4 +59,5 @@ const structure = [
 	{ id: 3, label: 'Unidades', link: '/unidades', icon: <TransporteIcon /> },
 	{ id: 4, label: 'Estadísticas', link: '/estadisticas', icon: <BarChart /> },
 	{ id: 5, label: 'Gastos', link: '/gastos', icon: <GastoIcon /> },
+	{ id: 6, label: 'Reservas', link: '/reservas-pedidos', icon: <BorderColorIcon /> },
 ];

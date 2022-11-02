@@ -20,6 +20,13 @@ export const columnasPedidos = [
 		grow: 1,
 	},
 	{
+		name: 'Distancia',
+		selector: (row) => row.distanciaRecorrida,
+		sortable: false,
+		grow: 0.4,
+		cell: (row) => <div>{row.distanciaRecorrida && row.distanciaRecorrida != 0 ? `${Math.round(row.distanciaRecorrida / 1000)}km` : '-'}</div>,
+	},
+	{
 		name: 'Estado',
 		selector: (row) => row.estado,
 		sortable: false,
@@ -41,15 +48,11 @@ export const columnasPedidos = [
 	},
 	{
 		name: 'Fecha',
-		selector: (row) => row?.fechaCreacion,
+		selector: (row) => row?.fechaRetiro,
 		sortable: false,
 		grow: 0.7,
 		cell: (row) =>
-			row?.fechaCreacion ? (
-				`${new Date(row.fechaCreacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}`
-			) : (
-				<div>-</div>
-			),
+			row?.fechaRetiro ? `${new Date(row.fechaRetiro).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}` : <div>-</div>,
 	},
 ];
 

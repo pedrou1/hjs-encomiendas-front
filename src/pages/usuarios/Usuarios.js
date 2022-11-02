@@ -139,7 +139,7 @@ const Usuarios = () => {
 						<div className="align-self-end">
 							<Filtros anchorEl={openFiltros} setAnchorEl={setOpenFiltros}>
 								<Typography>Filtros</Typography>
-								<InputLabel sx={{ mt: 1 }}>Categoría</InputLabel>
+								<InputLabel sx={{ mt: 1 }}>Categorías</InputLabel>
 
 								<Select
 									menuPortalTarget={document.querySelector('.MuiPaper-elevation')}

@@ -55,7 +55,7 @@ const UnidadesTransporte = () => {
 			if (res.operationResult == Constantes.SUCCESS) {
 				setOpenModal(false);
 				actualizarTabla();
-				toast.success('Unidad eliminado correctamente');
+				toast.success('Unidad eliminada correctamente');
 			} else {
 				toast.error('Ha ocurrido un error');
 				navigate('/error');
@@ -146,12 +146,6 @@ const cols = [
 		grow: 1,
 	},
 	{
-		name: 'Promedio de consumo',
-		selector: (row) => row.promedioConsumo,
-		sortable: false,
-		grow: 1,
-	},
-	{
 		name: 'Marca',
 		selector: (row) => row?.marca,
 		sortable: false,
@@ -167,7 +161,23 @@ const cols = [
 	{
 		name: 'Año',
 		selector: (row) => row?.anio,
-		grow: 1,
+		grow: 0.5,
 		cell: (row) => (row?.anio ? row?.anio : <div>-</div>),
+	},
+	{
+		name: 'Vto. Seguro',
+		selector: (row) => row?.vtoSeguro,
+		sortable: false,
+		grow: 0.6,
+		cell: (row) =>
+			row.vtoSeguro ? `${new Date(row.vtoSeguro).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}` : <div>-</div>,
+	},
+	{
+		name: 'Vto. Patente',
+		selector: (row) => row?.vtoPatente,
+		sortable: false,
+		grow: 0.6,
+		cell: (row) =>
+			row.vtoPatente ? `${new Date(row.vtoPatente).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}` : <div>-</div>,
 	},
 ];

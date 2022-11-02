@@ -7,12 +7,14 @@ import * as servicioUsuarios from '../../services/ServicioUsuarios';
 import { defaultStyles } from '../../utils/defaultStyles';
 import CircularProgress from '@mui/material/CircularProgress';
 import Table from '../../components/Table';
-import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
 import * as Constantes from '../../utils/constantes';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import Filtros from './../../components/Filtros';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import es from 'date-fns/locale/es';
 
 const Estadisticas = () => {
 	const [loading, setLoading] = useState(false);
@@ -23,6 +25,7 @@ const Estadisticas = () => {
 	const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(Constantes.categoriasUsuarios[0]);
 	const [openFiltros, setOpenFiltros] = useState(null);
 	const [verGraficas, setVerGraficas] = useState(true);
+	const [anio, setAnio] = useState(new Date());
 
 	const navigate = useNavigate();
 
@@ -44,15 +47,19 @@ const Estadisticas = () => {
 		getUsuarios();
 	}, []);
 
-	const obtenerCantidadPedidos = async () => {
+	const obtenerCantidadPedidos = async (anioIn) => {
 		setLoading(true);
-		const cantidadP = await servicioPedidos.obtenerCantidadPedidosPorMes();
-		setCantidadPedidos([{ ...cantidadPedidos[0], data: cantidadP }]);
+		const anioFiltro = anioIn ? anioIn : anio;
+		if (!(anioFiltro.getFullYear() > new Date().getFullYear() || anioFiltro.getFullYear() < 2020)) {
+			const cantidadP = await servicioPedidos.obtenerCantidadPedidosPorMes(anioFiltro.getFullYear());
+			setCantidadPedidos([{ ...cantidadPedidos[0], data: cantidadP }]);
 
-		const cantidadC = await servicioUsuarios.obtenerCantidadClientesPorMes();
-		setCantidadClientes([{ ...cantidadClientes[0], data: cantidadC }]);
+			const cantidadC = await servicioUsuarios.obtenerCantidadClientesPorMes(anioFiltro.getFullYear());
+			setCantidadClientes([{ ...cantidadClientes[0], data: cantidadC }]);
+		}
 		setLoading(false);
 	};
+
 	const getUsuarios = async (newPaginationData, tipo) => {
 		let params = globalParams;
 		if (newPaginationData) {
@@ -97,13 +104,13 @@ const Estadisticas = () => {
 	return (
 		<Container component="main">
 			<Helmet>
-				<title>Ver perfil</title>
+				<title>Ver estadísticas</title>
 			</Helmet>
 			<CssBaseline />
 			<div className="align-items-end d-flex flex-column mb-1">
 				<div className="align-self-end">
 					<Button variant="contained" style={{ fontSize: '15px', fontFamily: 'PT Sans' }} onClick={() => setVerGraficas(!verGraficas)}>
-						{verGraficas ? 'Ver por usuario' : 'Ver estadisticas'}
+						{verGraficas ? 'Ver por usuario' : 'Ver estadísticas'}
 					</Button>
 				</div>
 			</div>
@@ -117,9 +124,34 @@ const Estadisticas = () => {
 					}}
 				>
 					<Box>
+						<Grid item xs={12} lg={12} className="d-flex justify-content-between">
+							<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+								<DatePicker
+									views={['year']}
+									label="Año"
+									value={anio}
+									disableFuture={true}
+									minDate={new Date('2020-05-01')}
+									maxDate={new Date()}
+									onChange={(newValue) => {
+										console.log(newValue);
+										if (newValue > new Date()) {
+											setAnio(new Date());
+										} else {
+											setAnio(newValue);
+										}
+										obtenerCantidadPedidos(newValue);
+									}}
+									renderInput={(params) => <TextField {...params} sx={{ width: 120, mt: 2, ml: 1 }} helperText={null} />}
+								/>
+							</LocalizationProvider>
+							<Typography variant="h6" style={{ marginRight: '8rem' }}>
+								Pedidos
+							</Typography>
+							<div></div>
+						</Grid>
 						<Grid className="align-items-center d-flex flex-column">
 							<>
-								<Typography variant="h6">Pedidos</Typography>
 								<Chart options={options} series={cantidadPedidos} type="bar" width={800} height={320} />
 
 								{loading ? (
@@ -146,7 +178,7 @@ const Estadisticas = () => {
 				>
 					<Grid item xs={3} lg={3} className="d-flex justify-content-between">
 						<div className="px-3 pt-3"></div>
-						<div className="pt-3" style={{ marginRight: '3.5rem' }}>
+						<div className="pt-3" style={{ marginLeft: '2.5rem' }}>
 							<h5>Cantidad de pedidos por usuario</h5>
 						</div>
 

@@ -32,7 +32,12 @@ const Table = ({ title, data = [], columns, totalRows, onPageChange, onRowClicke
 	};
 
 	return (
-		<TableContainer component={Paper} className="mb-4 mt-2" sx={data && !data.length && !loading ? styles.tableEmpty : { ...defaultStyles.boxShadow }}>
+		<TableContainer
+			component={Paper}
+			className="mb-4 mt-2"
+			sx={data && !data.length && !loading ? styles.tableEmpty : { ...defaultStyles.boxShadow }}
+			style={{ ...defaultStyles.boxShadow }}
+		>
 			{children}
 			<DataTable
 				title={title ? <div className="mt-4">{title}</div> : null}

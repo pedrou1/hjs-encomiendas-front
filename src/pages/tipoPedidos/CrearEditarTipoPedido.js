@@ -90,7 +90,7 @@ const CrearEditarTipoPedido = () => {
 									variant="outlined"
 									fullWidth
 									id="nombre"
-									label="Nombre"
+									label="Nombre *"
 									autoFocus
 									value={formik.values.nombre}
 									onChange={formik.handleChange}
@@ -207,7 +207,11 @@ const useStyles = () => ({
 });
 
 const validationSchema = yup.object({
-	nombre: yup.string('Introduce el nombre').min(4, 'El nombre debe tener una longitud mínima de 4 caracteres').required('Introduce el nombre'),
+	nombre: yup
+		.string('Introduce el nombre')
+		.min(4, 'El nombre debe tener una longitud mínima de 4 caracteres')
+		.max(100, 'El nombre debe tener una longitud máxima de 100 caracteres')
+		.required('Introduce el nombre'),
 	pesoDesde: yup.number('Introduce el peso').min(0).required('Introduce el peso'),
 	pesoHasta: yup.number('Introduce el peso').min(0).required('Introduce el peso'),
 	tarifa: yup.number('Introduce la tarifa').min(0).required('Introduce la tarifa'),

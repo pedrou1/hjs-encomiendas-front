@@ -28,6 +28,8 @@ import TiposPedidos from './pages/tipoPedidos/TiposPedidos';
 import Gastos from './pages/gastos/Gastos';
 import CrearEditarGasto from './pages/gastos/CrearEditarGasto';
 import CambiarContrasenia from './pages/usuarios/CambiarContrasenia';
+import ReservarPedido from './pages/pedidos/ReservarPedido';
+import ReservasPedidos from './pages/pedidos/ReservasPedidos';
 
 function App() {
 	const [usuario, setUsuario] = useState(null);
@@ -120,6 +122,26 @@ function App() {
 						element={
 							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<CrearEditarPedido />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/reservar-pedido"
+						exact
+						element={
+							<ProtectedRoute permisos={[Constantes.PERMISO_CLIENTE]}>
+								<ReservarPedido />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/reservas-pedidos"
+						exact
+						element={
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
+								<ReservasPedidos />
 							</ProtectedRoute>
 						}
 					/>

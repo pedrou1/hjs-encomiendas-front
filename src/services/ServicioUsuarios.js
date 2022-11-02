@@ -30,9 +30,18 @@ export const obtenerUsuario = async (idUsuario) => {
 	} catch (err) {}
 };
 
-export const obtenerCantidadClientesPorMes = async () => {
+export const obtenerChoferDeReserva = async () => {
 	try {
-		const res = await http.get(`${url}/por-mes`);
+		const res = await http.get(`${url}/choferReserva`);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
+export const obtenerCantidadClientesPorMes = async (anio = 0) => {
+	try {
+		const res = await http.get(`${url}/por-mes/${anio}`);
 		if (res.status == 200) {
 			return res.data;
 		}

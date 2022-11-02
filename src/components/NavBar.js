@@ -8,9 +8,9 @@ import * as authService from '../services/AuthService';
 
 const NavBar = ({ usuario }) => {
 	const classes = useStyles();
-	const [anchor, setAnchor] = useState(null); // expande la navbar movil
+	const [anchor, setAnchor] = useState(null);
 	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // set media query
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const open = Boolean(anchor);
 	const handleMenu = (event) => {
 		setAnchor(event.currentTarget);
@@ -25,7 +25,7 @@ const NavBar = ({ usuario }) => {
 		<div className={classes.root}>
 			<AppBar style={{ background: '#212121' }}>
 				<Toolbar>
-					{isMobile ? ( // abre la navbar movil
+					{isMobile ? (
 						<>
 							<Drawer
 								variant="temporary"
@@ -70,7 +70,7 @@ const NavBar = ({ usuario }) => {
 									to={process.env.PUBLIC_URL + '/'}
 									onClick={() => setAnchor(null)}
 								>
-									HJS Encomiendas
+									<img src={require('../pages/common/logo.png')} alt="logo" className="img-fluid" width="200" height="200" />
 								</Button>
 							</Box>
 							<>

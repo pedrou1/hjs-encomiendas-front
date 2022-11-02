@@ -1,4 +1,4 @@
-import { Button, TextField, Link, CssBaseline, Box, Grid, Typography, Container, Paper, MenuItem } from '@mui/material';
+import { Button, TextField, Link, CssBaseline, Box, Grid, Typography, Container, Paper, FormHelperText, InputAdornment } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Helmet } from 'react-helmet';
@@ -11,6 +11,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import SelectPaginate from '../../components/SelectPaginate';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import es from 'date-fns/locale/es';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const CrearEditarUnidad = () => {
 	const navigate = useNavigate();
@@ -18,6 +22,10 @@ const CrearEditarUnidad = () => {
 	const [chofer, setChofer] = useState({});
 	const [errors, setErrors] = useState({});
 	const unidad = state?.unidad ? state.unidad : null;
+	const [vtoSeguro, setVtoSeguro] = useState(unidad?.vtoSeguro ? new Date(unidad.vtoSeguro) : null);
+	const [vtoPatente, setVtoPatente] = useState(unidad?.vtoPatente ? new Date(unidad.vtoPatente) : null);
+	const [vtoMinisterio, setVtoMinisterio] = useState(unidad?.vtoMinisterio ? new Date(unidad.vtoMinisterio) : null);
+	const [vtoApplus, setVtoApplus] = useState(unidad?.vtoApplus ? new Date(unidad.vtoApplus) : null);
 
 	useEffect(() => {
 		if (unidad) {
@@ -33,16 +41,16 @@ const CrearEditarUnidad = () => {
 					promedioConsumo: unidad.promedioConsumo ? unidad.promedioConsumo : '',
 					marca: unidad.marca ? unidad.marca : '',
 					modelo: unidad.modelo ? unidad.modelo : '',
-					anio: unidad.anio ? unidad.anio : 0,
+					anio: unidad.anio ? unidad.anio : '',
 					padron: unidad.padron ? unidad.padron : '',
 					matricula: unidad.matricula ? unidad.matricula : '',
 			  }
 			: {
 					nombre: '',
-					promedioConsumo: 0,
+					promedioConsumo: '',
 					marca: '',
 					modelo: '',
-					anio: 0,
+					anio: '',
 					padron: '',
 					matricula: '',
 			  },
@@ -50,12 +58,24 @@ const CrearEditarUnidad = () => {
 
 		onSubmit: async (values, e) => {
 			try {
-				checkErrors();
-				if (chofer.value) {
-					if (values.anio == '') {
+				const err = checkErrors(values);
+				if (chofer.value && !err) {
+					if (values.anio == '' || values.anio == null) {
 						values.anio = 0;
 					}
-					const unidadIngresada = { ...values, idChofer: chofer.value, idUnidadTransporte: unidad?.idUnidadTransporte };
+					if (values.promedioConsumo == '' || values.promedioConsumo == null) {
+						values.promedioConsumo = 0;
+					}
+
+					const unidadIngresada = {
+						...values,
+						idChofer: chofer.value,
+						idUnidadTransporte: unidad?.idUnidadTransporte,
+						vtoSeguro,
+						vtoPatente,
+						vtoMinisterio,
+						vtoApplus,
+					};
 
 					const res = unidad ? await servicioUnidades.modificarUnidad(unidadIngresada) : await servicioUnidades.registrarUnidad(unidadIngresada);
 
@@ -88,10 +108,13 @@ const CrearEditarUnidad = () => {
 		};
 	}
 
-	const checkErrors = () => {
+	const checkErrors = (values) => {
+		const errAnio = values.anio && (values.anio < 1990 || values.anio > new Date().getFullYear()) ? true : false;
 		setErrors({
 			chofer: !chofer?.value ? true : false,
+			anio: errAnio,
 		});
+		return errAnio;
 	};
 
 	return (
@@ -131,7 +154,7 @@ const CrearEditarUnidad = () => {
 									variant="outlined"
 									fullWidth
 									id="nombre"
-									label="Nombre"
+									label="Nombre *"
 									autoFocus
 									value={formik.values.nombre}
 									onChange={formik.handleChange}
@@ -201,6 +224,21 @@ const CrearEditarUnidad = () => {
 									error={formik.touched.anio && Boolean(formik.errors.anio)}
 									helperText={formik.touched.anio && formik.errors.anio}
 								/>
+
+								{errors.anio ? (
+									<FormHelperText
+										error={Boolean(true)}
+										sx={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											padding: '0 10px',
+										}}
+									>
+										<span>Ingrese un año correcto</span>
+									</FormHelperText>
+								) : (
+									<></>
+								)}
 							</Grid>
 
 							<Grid item xs={12} sm={6}>
@@ -241,9 +279,80 @@ const CrearEditarUnidad = () => {
 								/>
 							</Grid>
 
+							<Grid item xs={12} sm={6}>
+								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+									<DatePicker
+										label="Vto. Seguro"
+										value={vtoSeguro}
+										onChange={(f) => setVtoSeguro(f)}
+										renderInput={(params) => <TextField {...params} />}
+									/>
+								</LocalizationProvider>
+							</Grid>
+							<Grid item xs={12} sm={6}>
+								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+									<DatePicker
+										label="Vto. Patente"
+										value={vtoPatente}
+										onChange={(f) => setVtoPatente(f)}
+										renderInput={(params) => <TextField {...params} />}
+									/>
+								</LocalizationProvider>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+									<DatePicker
+										label="Vto. Ministerio"
+										value={vtoMinisterio}
+										onChange={(f) => setVtoMinisterio(f)}
+										renderInput={(params) => <TextField {...params} />}
+									/>
+								</LocalizationProvider>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+									<DatePicker
+										label="Vto. Applus"
+										value={vtoApplus}
+										onChange={(f) => setVtoApplus(f)}
+										renderInput={(params) => <TextField {...params} />}
+									/>
+								</LocalizationProvider>
+							</Grid>
+
+							<Grid item xs={12} sm={6}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="promedioConsumo"
+									variant="outlined"
+									type="number"
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
+									fullWidth
+									id="promedioConsumo"
+									label="Consumo"
+									value={formik.values.promedioConsumo}
+									onChange={formik.handleChange}
+									error={formik.touched.promedioConsumo && Boolean(formik.errors.promedioConsumo)}
+									helperText={formik.touched.promedioConsumo && formik.errors.promedioConsumo}
+									InputProps={{
+										endAdornment: <InputAdornment position="start">Km/L</InputAdornment>,
+									}}
+								/>
+							</Grid>
+
 							<Grid className="text-start mb-3" item xs={12} sm={8}>
 								<SelectPaginate
-									label="Chofer"
+									label="Chofer *"
 									errorLabel={errors.chofer ? 'Ingrese un chofer' : ''}
 									value={chofer}
 									loadOptions={loadOptionsChofer}
@@ -283,7 +392,18 @@ const useStyles = () => ({
 });
 
 const validationSchema = yup.object({
-	nombre: yup.string('Introduce el nombre').min(4, 'El nombre debe tener una longitud mínima de 4 caracteres').required('Introduce el nombre'),
+	nombre: yup
+		.string('Introduce el nombre')
+		.min(4, 'El nombre debe tener una longitud mínima de 4 caracteres')
+		.max(100, 'El nombre debe tener una longitud máxima de 100 caracteres')
+		.required('Introduce el nombre'),
+	marca: yup
+		.string('Introduce la marca')
+		.min(2, 'La marca debe tener una longitud mínima de 2 caracteres')
+		.max(100, 'La marca debe tener una longitud máxima de 100 caracteres'),
+	modelo: yup.string('Introduce el modelo').max(100, 'El modelo debe tener una longitud máxima de 100 caracteres'),
+	padron: yup.string('Introduce el padrón').max(100, 'El padrón debe tener una longitud máxima de 100 caracteres'),
+	matricula: yup.string('Introduce la matrícula').max(50, 'La matrícula debe tener una longitud máxima de 50 caracteres'),
 });
 
 export default CrearEditarUnidad;

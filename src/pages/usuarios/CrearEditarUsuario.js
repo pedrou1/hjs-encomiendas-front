@@ -139,7 +139,7 @@ const CrearEditarUsuario = () => {
 									variant="outlined"
 									fullWidth
 									id="nombre"
-									label={esParticular ? 'Nombre' : 'Razón social'}
+									label={esParticular ? 'Nombre *' : 'Razón social *'}
 									autoFocus
 									value={formik.values.nombre}
 									onChange={formik.handleChange}
@@ -184,7 +184,7 @@ const CrearEditarUsuario = () => {
 											variant="outlined"
 											fullWidth
 											id="ci"
-											label="Cédula de identidad"
+											label="Cédula de identidad *"
 											value={ci}
 											onKeyPress={(event) => {
 												if (!/[0-9]/.test(event.key)) {
@@ -208,7 +208,7 @@ const CrearEditarUsuario = () => {
 											variant="outlined"
 											fullWidth
 											id="rut"
-											label="RUT"
+											label="RUT *"
 											value={rut}
 											onKeyPress={(event) => {
 												if (!/[0-9]/.test(event.key)) {
@@ -318,6 +318,31 @@ const CrearEditarUsuario = () => {
 
 							<Grid item xs={12}>
 								<TextField
+									select
+									name="categoriaUsuario"
+									variant="outlined"
+									label="Categoría"
+									margin="normal"
+									fullWidth
+									value={formik.values.categoriaUsuario}
+									onChange={formik.handleChange('categoriaUsuario')}
+									error={formik.touched.categoriaUsuario && Boolean(formik.errors.categoriaUsuario)}
+									helperText={formik.touched.categoriaUsuario && formik.errors.categoriaUsuario}
+								>
+									<MenuItem value={Constantes.ID_CLIENTE}>
+										<span>Cliente</span>
+									</MenuItem>
+									<MenuItem value={Constantes.ID_CHOFER}>
+										<span>Chofer</span>
+									</MenuItem>
+									<MenuItem value={Constantes.ID_ADMINISTRADOR}>
+										<span>Administrador</span>
+									</MenuItem>
+								</TextField>
+							</Grid>
+
+							<Grid item xs={12}>
+								<TextField
 									InputLabelProps={{
 										classes: {
 											root: classes.label,
@@ -367,35 +392,19 @@ const CrearEditarUsuario = () => {
 									id="nroPuerta"
 									label="Número de puerta"
 									value={formik.values.nroPuerta}
-									onChange={formik.handleChange}
+									onChange={(event) => {
+										if (isFinite(event.target.value)) {
+											formik.handleChange(event);
+										}
+									}}
+									onKeyPress={(event) => {
+										if (!/[0-9]/.test(event.key)) {
+											event.preventDefault();
+										}
+									}}
 									error={formik.touched.nroPuerta && Boolean(formik.errors.nroPuerta)}
 									helperText={formik.touched.nroPuerta && formik.errors.nroPuerta}
 								/>
-							</Grid>
-
-							<Grid item xs={12}>
-								<TextField
-									select
-									name="categoriaUsuario"
-									variant="outlined"
-									label="Categoría"
-									margin="normal"
-									fullWidth
-									value={formik.values.categoriaUsuario}
-									onChange={formik.handleChange('categoriaUsuario')}
-									error={formik.touched.categoriaUsuario && Boolean(formik.errors.categoriaUsuario)}
-									helperText={formik.touched.categoriaUsuario && formik.errors.categoriaUsuario}
-								>
-									<MenuItem value={Constantes.ID_CLIENTE}>
-										<span>Cliente</span>
-									</MenuItem>
-									<MenuItem value={Constantes.ID_CHOFER}>
-										<span>Chofer</span>
-									</MenuItem>
-									<MenuItem value={Constantes.ID_ADMINISTRADOR}>
-										<span>Administrador</span>
-									</MenuItem>
-								</TextField>
 							</Grid>
 
 							<Grid item xs={12} sm={6}>
@@ -470,26 +479,41 @@ const useStyles = () => ({
 
 const validationSchema = yup.object({
 	nombre: yup
-		.string('Introduce tu nombre/razón social')
+		.string('Introduce el/la nombre/razón social')
 		.min(4, 'El nombre/razón social debe tener una longitud mínima de 4 caracteres')
-		.required('Introduce tu nombre/razón social'),
-	apellido: yup.string('Introduce tu apellido').nullable(),
-	email: yup.string('Introduce tu email').email('Formato incorrecto'),
+		.max(100, 'El nombre/razón social debe tener una longitud máxima de 100 caracteres')
+		.required('Introduce el/la nombre/razón social'),
+	apellido: yup.string('Introduce el apellido').nullable().max(100, 'El apellido debe tener una longitud máxima de 100 caracteres'),
+	email: yup.string('Introduce el email').email('Formato incorrecto').max(150, 'El email debe tener una longitud máxima de 150 caracteres'),
 	telefono: yup
-		.string('Introduce tu teléfono')
+		.string('Introduce el teléfono')
 		.nullable()
 		.min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres')
 		.max(15, 'El teléfono debe tener una longitud máxima de 15 caracteres'),
 	telefono2: yup
-		.string('Introduce tu teléfono')
+		.string('Introduce el teléfono secundario')
 		.nullable()
 		.min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres')
-		.max(20, 'El teléfono debe tener una longitud máxima de 15 caracteres'),
-	apartamento: yup.string('Introduce tu apartamento').min(4, 'El apartamento debe tener una longitud mínima de 4 caracteres'),
-	nroPuerta: yup.string('Introduce tu número de puerta'),
-	direccion: yup.string('Introduce tu dirección').min(4, 'La dirección debe tener una longitud mínima de 4 caracteres'),
-	usuario: yup.string('Introduce tu nombre de usuario').min(4, 'El nombre de usuario debe tener una longitud mínima de 4 caracteres'),
-	password: yup.string('Introduce tu contraseña').min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres'),
+		.max(15, 'El teléfono debe tener una longitud máxima de 15 caracteres'),
+	apartamento: yup
+		.string('Introduce el apartamento')
+		.min(4, 'El apartamento debe tener una longitud mínima de 4 caracteres')
+		.max(100, 'El apartamento no puede superar los 100 caracteres'),
+	nroPuerta: yup.string('Introduce el número de puerta').max(6, 'El número de puerta no puede superar los 6 caracteres'),
+	direccion: yup
+		.string('Introduce la dirección')
+		.min(4, 'La dirección debe tener una longitud mínima de 4 caracteres')
+		.max(200, 'La dirección debe tener una longitud máxima de 200 caracteres'),
+	usuario: yup
+		.string('Introduce el nombre de usuario')
+		.min(4, 'El nombre de usuario debe tener una longitud mínima de 4 caracteres')
+		.max(100, 'El nombre de usuario debe tener una longitud máxima de 100 caracteres')
+		.required('Introduce el nombre de usuario'),
+	password: yup
+		.string('Introduce la contraseña')
+		.min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres')
+		.max(80, 'La contraseña debe tener una longitud máxima de 80 caracteres')
+		.required('Introduce la contraseña'),
 	categoriaUsuario: yup.string('Introduce la categoría').required('Introduce la categoría'),
 });
 

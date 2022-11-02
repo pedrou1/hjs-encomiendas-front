@@ -11,6 +11,15 @@ export const obtenerPedidos = async (params) => {
 	} catch (err) {}
 };
 
+export const obtenerPedidosReservados = async (params) => {
+	try {
+		const res = await http.get(`${url}/reservados`, { params });
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
 export const obtenerPedido = async (idPedido) => {
 	try {
 		const res = await http.get(`${url}/${idPedido}`);
@@ -20,9 +29,9 @@ export const obtenerPedido = async (idPedido) => {
 	} catch (err) {}
 };
 
-export const obtenerCantidadPedidosPorMes = async () => {
+export const obtenerCantidadPedidosPorMes = async (anio = 0) => {
 	try {
-		const res = await http.get(`${url}/por-mes`);
+		const res = await http.get(`${url}/por-mes/${anio}`);
 		if (res.status == 200) {
 			return res.data;
 		}

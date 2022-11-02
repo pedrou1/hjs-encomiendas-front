@@ -40,7 +40,7 @@ export const registrarUnidad = async (unidad) => {
 
 export const modificarUnidad = async (unidad) => {
 	try {
-		const res = await http.post(url + '/modificar', unidad);
+		const res = await http.put(url + '/modificar', unidad);
 		if (res.status == 200) {
 			return res.data;
 		}

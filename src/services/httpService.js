@@ -9,9 +9,10 @@ axios.interceptors.response.use(null, (error) => {
 
 	if (!expectedError) {
 		toast.error('Ha ocurrido un error con su conexión');
+		//window.location = '#/error';
 	}
-	// window.location = '/error';
-	console.log(error.response);
+
+	// console.log(error.response);
 	return Promise.reject(error);
 });
 

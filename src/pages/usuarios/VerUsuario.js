@@ -29,6 +29,8 @@ import es from 'date-fns/locale/es';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import { defaultStyles } from '../../utils/defaultStyles';
 
 const estados = Constantes.estados;
 
@@ -40,21 +42,19 @@ const VerUsuario = () => {
 	const [countPedidos, setCountPedidos] = useState(0);
 	const [loadingFinished, setLoadingFinished] = useState(false);
 	const [paginationData, setPaginationData] = useState({ PageIndex: 0, PageSize: 10 });
-	const [esAdmin, setEsAdmin] = useState(false);
 	const [unidad, setUnidad] = useState('');
 	const [estado, setEstado] = useState([]);
 	const [openFiltros, setOpenFiltros] = useState(null);
 	const [fechaDesde, setFechaDesde] = useState(null);
 	const [fechaHasta, setFechaHasta] = useState(null);
-	const [columnas, setColumnas] = useState(columnasPedidos);
+	const [columnas, setColumnas] = useState(columnasNew);
+	const usuarioActual = authService.getCurrentUser();
+	const esAdmin = usuarioActual.idCategoria === Constantes.ID_ADMINISTRADOR;
 
 	const navigate = useNavigate();
 	const classes = useStyles();
 
 	useEffect(() => {
-		const usuarioActual = authService.getCurrentUser();
-		setEsAdmin(usuarioActual.idCategoria === Constantes.ID_ADMINISTRADOR);
-
 		getUsuario();
 		getPedidos();
 	}, []);
@@ -73,9 +73,13 @@ const VerUsuario = () => {
 		setUsuario(usuario);
 
 		if (usuario.idCategoria === Constantes.ID_CLIENTE) {
-			setColumnas(columnasPedidos.filter((p) => p.name !== 'Cliente'));
+			let col = columnasNew
+				.filter((p) => p.name !== 'Cliente')
+				.filter((p) => p.name !== 'Unidad')
+				.filter((p) => p.name !== 'Chofer');
+			setColumnas(col);
 		} else if (usuario.idCategoria === Constantes.ID_CHOFER) {
-			setColumnas(columnasPedidos.filter((p) => p.name !== 'Chofer'));
+			setColumnas(columnasNew.filter((p) => p.name !== 'Chofer'));
 		}
 
 		const unidad = await servicioUnidades.otenerUnidadDeChofer(idUsuario);
@@ -86,14 +90,18 @@ const VerUsuario = () => {
 	};
 
 	const handleDelete = async () => {
-		const res = await servicioUsuarios.eliminarUsuario(idUsuario);
-		if (res.operationResult == Constantes.SUCCESS) {
-			setOpenModal(false);
-			navigate(-1);
-			toast.success('Usuario eliminado correctamente');
+		if (idUsuario == usuarioActual.idUsuario) {
+			toast.error('No se puede eliminar el usuario actual');
 		} else {
-			toast.error('Ha ocurrido un error');
-			navigate('/error');
+			const res = await servicioUsuarios.eliminarUsuario(idUsuario);
+			if (res.operationResult == Constantes.SUCCESS) {
+				setOpenModal(false);
+				navigate(-1);
+				toast.success('Usuario eliminado correctamente');
+			} else {
+				toast.error('Ha ocurrido un error');
+				navigate('/error');
+			}
 		}
 	};
 
@@ -141,39 +149,57 @@ const VerUsuario = () => {
 			{usuario && (
 				<div>
 					<Grid item xs={3} lg={3} className="d-flex flex-column">
-						{esAdmin && (
-							<div className="align-self-end" style={{ minHeight: !usuario?.nombre ? '2.3rem' : '0rem' }}>
-								{usuario?.usuario ? (
-									<Button
-										variant="outlined"
-										sx={{ mr: 1 }}
-										startIcon={<KeyIcon />}
-										onClick={() => navigate('/usuario/cambiar-password', { state: { usuario } })}
-									>
-										Cambiar contraseña
-									</Button>
-								) : (
-									<></>
-								)}
-								{usuario?.nombre ? (
-									<>
+						<div className="align-self-end" style={{ minHeight: !usuario?.nombre ? '2.3rem' : '0rem' }}>
+							{usuario?.usuario && usuarioActual.idCategoria === Constantes.ID_CLIENTE ? (
+								<Button
+									variant="contained"
+									startIcon={<BorderColorIcon />}
+									onClick={() => navigate('/reservar-pedido', { state: { usuario } })}
+								>
+									Reservar pedido
+								</Button>
+							) : (
+								<></>
+							)}
+							{esAdmin && (
+								<>
+									{usuario?.usuario ? (
 										<Button
 											variant="outlined"
 											sx={{ mr: 1 }}
-											startIcon={<EditIcon />}
-											onClick={() => navigate('/crear-usuario', { state: { usuario: usuario } })}
+											startIcon={<KeyIcon />}
+											onClick={() => navigate('/usuario/cambiar-password', { state: { usuario } })}
 										>
-											Modificar
+											Cambiar contraseña
 										</Button>
-										<Button variant="outlined" startIcon={<DeleteIcon />} onClick={() => setOpenModal(!openModal)}>
-											Eliminar
-										</Button>
-									</>
-								) : (
-									<></>
-								)}
-							</div>
-						)}
+									) : (
+										<></>
+									)}
+									{usuario?.nombre ? (
+										<>
+											<Button
+												variant="outlined"
+												sx={{ mr: 1 }}
+												startIcon={<EditIcon />}
+												onClick={() => navigate('/crear-usuario', { state: { usuario: usuario } })}
+											>
+												Modificar
+											</Button>
+											<Button
+												variant="outlined"
+												startIcon={<DeleteIcon />}
+												disabled={idUsuario == usuarioActual.idUsuario}
+												onClick={() => setOpenModal(!openModal)}
+											>
+												Eliminar
+											</Button>
+										</>
+									) : (
+										<></>
+									)}
+								</>
+							)}
+						</div>
 						<ModalDialog
 							open={openModal}
 							titulo="¿Estas seguro?"
@@ -185,7 +211,7 @@ const VerUsuario = () => {
 					</Grid>
 					<Grid container spacing={2}>
 						<Grid item xs={12} lg={4}>
-							<Paper sx={{ p: 2, paddingX: { xs: 4, md: 2 } }} className="mt-2">
+							<Paper sx={{ p: 2, paddingX: { xs: 4, md: 2 } }} className="mt-2" style={{ ...defaultStyles.boxShadow }}>
 								{usuario.nombre ? (
 									<>
 										<Stack alignItems="center" spacing={1}>
@@ -234,7 +260,7 @@ const VerUsuario = () => {
 													<Typography variant="body1">{usuario.direccion}</Typography>
 												</UserInfoText>
 											)}
-											{usuario.usuario && (
+											{usuario.usuario && esAdmin && (
 												<UserInfoText>
 													<CheckOutlinedIcon />
 													<Typography variant="body1">Tiene cuenta</Typography>
@@ -378,3 +404,27 @@ const customStyles = {
 		};
 	},
 };
+
+const columnasNew = [
+	...columnasPedidos,
+	{
+		name: 'Fecha retiro',
+		selector: (row) => row?.fechaRetiro,
+		sortable: false,
+		grow: 0.7,
+		cell: (row) =>
+			row?.fechaRetiro ? `${new Date(row.fechaRetiro).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}` : <div>-</div>,
+	},
+	{
+		name: 'Fecha entrega',
+		selector: (row) => row?.fechaEntrega,
+		sortable: false,
+		grow: 0.7,
+		cell: (row) =>
+			row?.fechaEntrega ? (
+				`${new Date(row.fechaEntrega).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' })}`
+			) : (
+				<div>-</div>
+			),
+	},
+];

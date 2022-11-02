@@ -148,9 +148,10 @@ const cols = [
 	},
 	{
 		name: 'Unidad',
-		selector: (row) => row.transporte.nombre,
+		selector: (row) => row.transporte,
 		sortable: false,
 		grow: 1,
+		cell: (row) => <div>{row.transporte?.nombre ? row.transporte?.nombre : <></>}</div>,
 	},
 	{
 		name: 'Fecha',

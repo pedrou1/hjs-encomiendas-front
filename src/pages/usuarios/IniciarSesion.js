@@ -29,8 +29,9 @@ const IniciarSesion = (prop) => {
 				res.usuario.permiso = res.usuario.idCategoria;
 				authService.setLoggedIn(res.jwtToken, res.usuario);
 				setLoading(false);
-				window.location = '/usuarios';
+				navigate(`/usuarios`);
 				toast.success('Bienvenido');
+				window.location.reload();
 			} else if (res.operationResult == Constantes.ERROR) {
 				toast.error('Ha ocurrido un error');
 			} else if (res.operationResult == Constantes.INVALIDUSER) {
