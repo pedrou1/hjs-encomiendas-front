@@ -12,6 +12,15 @@ export const obtenerUsuarios = async (params) => {
 	} catch (err) {}
 };
 
+export const obtenerUsuariosEliminados = async (params) => {
+	try {
+		const res = await http.get(`${url}/eliminados`, { params });
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
 export const obtenerUsuariosYCantidadPedidos = async (params) => {
 	try {
 		const res = await http.get(`${url}/cantidad/pedidos`, { params });
@@ -78,6 +87,15 @@ export const modificarUsuario = async (usuario) => {
 export const modificarContraUsuario = async (usuario) => {
 	try {
 		const res = await http.put(url + '/modificar-contrasenia', usuario);
+		if (res.status == 200) {
+			return res.data;
+		}
+	} catch (err) {}
+};
+
+export const recuperarUsuario = async (usuario) => {
+	try {
+		const res = await http.put(url + '/recuperar-usuario', usuario);
 		if (res.status == 200) {
 			return res.data;
 		}

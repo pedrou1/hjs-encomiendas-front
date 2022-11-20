@@ -46,6 +46,7 @@ const RegistrarUsuario = () => {
 			email: '',
 			usuario: '',
 			password: '',
+			password2: '',
 			apartamento: '',
 			nroPuerta: '',
 		},
@@ -53,8 +54,10 @@ const RegistrarUsuario = () => {
 
 		onSubmit: async (values, e) => {
 			const error = checkErrors();
+			const isPassValid = values.password === values.password2;
 
-			if (!error) {
+			if (!error && isPassValid) {
+				values.password2 = undefined;
 				values.telefono = values.telefono ? values.telefono.toString() : null;
 				values.apellido = values.apellido ? values.apellido.toString() : '';
 				values.apellido = esParticular ? values.apellido : '';
@@ -70,6 +73,8 @@ const RegistrarUsuario = () => {
 				} else if (res.operationResult == Constantes.ERROR) {
 					window.location = '#/error';
 				}
+			} else if (!isPassValid) {
+				e.setFieldError('password2', 'Las contraseñas no coinciden');
 			}
 		},
 	});
@@ -88,6 +93,7 @@ const RegistrarUsuario = () => {
 				sx={{
 					paddingX: 6,
 					paddingY: 2,
+					marginBottom: 2,
 				}}
 			>
 				<Box
@@ -248,7 +254,6 @@ const RegistrarUsuario = () => {
 									fullWidth
 									id="telefono"
 									label="Teléfono *"
-									autoFocus
 									onKeyPress={(event) => {
 										if (!/[0-9]/.test(event.key)) {
 											event.preventDefault();
@@ -276,7 +281,6 @@ const RegistrarUsuario = () => {
 									fullWidth
 									id="direccion"
 									label="Dirección"
-									autoFocus
 									value={formik.values.direccion}
 									onChange={formik.handleChange}
 									error={formik.touched.direccion && Boolean(formik.errors.direccion)}
@@ -343,7 +347,6 @@ const RegistrarUsuario = () => {
 									fullWidth
 									id="usuario"
 									label="Usuario *"
-									autoFocus
 									value={formik.values.usuario}
 									onChange={formik.handleChange}
 									error={formik.touched.usuario && Boolean(formik.errors.usuario)}
@@ -369,6 +372,26 @@ const RegistrarUsuario = () => {
 									helperText={formik.touched.password && formik.errors.password}
 								/>
 							</Grid>
+
+							<Grid item xs={12}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="password2"
+									variant="outlined"
+									fullWidth
+									id="password2"
+									label="Repite tu contraseña *"
+									type="password"
+									value={formik.values.password2}
+									onChange={formik.handleChange}
+									error={formik.touched.password2 && Boolean(formik.errors.password2)}
+									helperText={formik.touched.password2 && formik.errors.password2}
+								/>
+							</Grid>
 							<Box mt={12} />
 						</Grid>
 						<Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, mb: 2 }}>
@@ -377,8 +400,8 @@ const RegistrarUsuario = () => {
 						<Grid container justifyContent="flex-end">
 							<Grid item>
 								<Box mt={2} />
-								<Link href={process.env.PUBLIC_URL + '/iniciar-sesion'} variant="body2">
-									¿Ya tienes una cuenta? Iniciar sesión
+								<Link href={process.env.PUBLIC_URL + '#/iniciar-sesion'} variant="body2">
+									¿Ya tienes una cuenta? Inicia sesión
 								</Link>
 							</Grid>
 						</Grid>
@@ -424,6 +447,11 @@ const validationSchema = yup.object({
 		.min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres')
 		.max(80, 'La contraseña debe tener una longitud máxima de 80 caracteres')
 		.required('Introduce tu contraseña'),
+	password2: yup
+		.string('Repite tu contraseña')
+		.min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres')
+		.max(80, 'La contraseña debe tener una longitud máxima de 80 caracteres')
+		.required('Repite tu contraseña'),
 	apartamento: yup
 		.string('Introduce el apartamento')
 		.min(4, 'El apartamento debe tener una longitud mínima de 4 caracteres')

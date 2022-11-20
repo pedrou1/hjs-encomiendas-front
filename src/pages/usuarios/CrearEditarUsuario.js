@@ -52,6 +52,7 @@ const CrearEditarUsuario = () => {
 					usuario: usuario.usuario ? usuario.usuario : '',
 					categoriaUsuario: usuario.idCategoria,
 					password: '',
+					password2: '',
 					apartamento: usuario.apartamento ? usuario.apartamento : '',
 					nroPuerta: usuario.nroPuerta ? usuario.nroPuerta : '',
 			  }
@@ -65,6 +66,7 @@ const CrearEditarUsuario = () => {
 					email: '',
 					usuario: '',
 					password: '',
+					password2: '',
 					categoriaUsuario: Constantes.ID_CLIENTE,
 					apartamento: '',
 			  },
@@ -73,8 +75,13 @@ const CrearEditarUsuario = () => {
 		onSubmit: async (values, e) => {
 			try {
 				const error = checkErrors();
+				let isPassValid = true;
+				if (values.password) {
+					isPassValid = values.password === values.password2;
+				}
 
-				if (!error) {
+				if (!error && isPassValid) {
+					values.password2 = undefined;
 					values.telefono = values.telefono ? values.telefono.toString() : null;
 					values.telefono2 = values.telefono2 ? values.telefono2.toString() : null;
 					values.apellido = values.apellido ? values.apellido.toString() : '';
@@ -93,6 +100,8 @@ const CrearEditarUsuario = () => {
 						toast.error('Ha ocurrido un error');
 						navigate('/error');
 					}
+				} else if (!isPassValid) {
+					e.setFieldError('password2', 'Las contraseñas no coinciden');
 				}
 			} catch (error) {
 				console.log(error);
@@ -271,7 +280,7 @@ const CrearEditarUsuario = () => {
 									variant="outlined"
 									fullWidth
 									id="telefono"
-									label="Teléfono"
+									label="Teléfono *"
 									value={formik.values.telefono}
 									onChange={(event) => {
 										if (isFinite(event.target.value)) {
@@ -444,6 +453,27 @@ const CrearEditarUsuario = () => {
 									helperText={formik.touched.password && formik.errors.password}
 								/>
 							</Grid>
+
+							<Grid item xs={12}>
+								<TextField
+									InputLabelProps={{
+										classes: {
+											root: classes.label,
+										},
+									}}
+									name="password2"
+									variant="outlined"
+									fullWidth
+									id="password2"
+									label="Repite tu contraseña *"
+									type="password"
+									value={formik.values.password2}
+									onChange={formik.handleChange}
+									error={formik.touched.password2 && Boolean(formik.errors.password2)}
+									helperText={formik.touched.password2 && formik.errors.password2}
+								/>
+							</Grid>
+
 							<Box mt={12} />
 						</Grid>
 						<Box
@@ -487,7 +517,7 @@ const validationSchema = yup.object({
 	email: yup.string('Introduce el email').email('Formato incorrecto').max(150, 'El email debe tener una longitud máxima de 150 caracteres'),
 	telefono: yup
 		.string('Introduce el teléfono')
-		.nullable()
+		.required('Introduce el teléfono')
 		.min(4, 'El teléfono debe tener una longitud mínima de 4 caracteres')
 		.max(15, 'El teléfono debe tener una longitud máxima de 15 caracteres'),
 	telefono2: yup
@@ -513,7 +543,12 @@ const validationSchema = yup.object({
 		.string('Introduce la contraseña')
 		.min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres')
 		.max(80, 'La contraseña debe tener una longitud máxima de 80 caracteres')
-		.required('Introduce la contraseña'),
+		.nullable(),
+	password2: yup
+		.string('Repite la contraseña')
+		.min(6, 'La contraseña debe tener una longitud mínima de 6 caracteres')
+		.max(80, 'La contraseña debe tener una longitud máxima de 80 caracteres')
+		.nullable(),
 	categoriaUsuario: yup.string('Introduce la categoría').required('Introduce la categoría'),
 });
 

@@ -76,6 +76,7 @@ const VerUsuario = () => {
 			let col = columnasNew
 				.filter((p) => p.name !== 'Cliente')
 				.filter((p) => p.name !== 'Unidad')
+				.filter((p) => p.name !== 'Distancia')
 				.filter((p) => p.name !== 'Chofer');
 			setColumnas(col);
 		} else if (usuario.idCategoria === Constantes.ID_CHOFER) {
@@ -309,23 +310,26 @@ const VerUsuario = () => {
 														noOptionsMessage={() => 'No hay mas datos'}
 														placeholder={''}
 													/>
-
-													<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
-														<DatePicker
-															label="Fecha desde"
-															value={fechaDesde}
-															onChange={(f) => setFechaDesde(f)}
-															renderInput={(params) => <TextField className="mt-3 w-50" {...params} />}
-														/>
-													</LocalizationProvider>
-													<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
-														<DatePicker
-															label="Fecha hasta"
-															value={fechaHasta}
-															onChange={(f) => setFechaHasta(f)}
-															renderInput={(params) => <TextField className="mt-3 w-50" {...params} />}
-														/>
-													</LocalizationProvider>
+													<div className="d-flex align-items-center">
+														<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+															<DatePicker
+																label="Fecha desde"
+																value={fechaDesde}
+																onChange={(f) => setFechaDesde(f)}
+																renderInput={(params) => (
+																	<TextField className="mt-3 w-50" style={{ marginRight: '0.4rem' }} {...params} />
+																)}
+															/>
+														</LocalizationProvider>
+														<LocalizationProvider dateAdapter={AdapterDateFns} locale={es}>
+															<DatePicker
+																label="Fecha hasta"
+																value={fechaHasta}
+																onChange={(f) => setFechaHasta(f)}
+																renderInput={(params) => <TextField className="mt-3 w-50" {...params} />}
+															/>
+														</LocalizationProvider>
+													</div>
 												</div>
 												<div className="mt-2 pb-1  d-flex justify-content-start">
 													<div className="mr-2">

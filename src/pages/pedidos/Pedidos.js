@@ -268,6 +268,9 @@ const Pedidos = () => {
 												label="Fecha desde"
 												value={fechaDesde}
 												onChange={(f) => setFechaDesde(f)}
+												PopperProps={{
+													placement: 'right',
+												}}
 												renderInput={(params) => <TextField className="mt-3 w-50" style={{ marginRight: '0.4rem' }} {...params} />}
 											/>
 										</LocalizationProvider>
@@ -276,6 +279,9 @@ const Pedidos = () => {
 												label="Fecha hasta"
 												value={fechaHasta}
 												onChange={(f) => setFechaHasta(f)}
+												PopperProps={{
+													placement: 'right',
+												}}
 												renderInput={(params) => <TextField className="mt-3 w-50" {...params} />}
 											/>
 										</LocalizationProvider>

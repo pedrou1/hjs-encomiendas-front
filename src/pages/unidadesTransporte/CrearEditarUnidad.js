@@ -109,7 +109,7 @@ const CrearEditarUnidad = () => {
 	}
 
 	const checkErrors = (values) => {
-		const errAnio = values.anio && (values.anio < 1990 || values.anio > new Date().getFullYear()) ? true : false;
+		const errAnio = values.anio && (values.anio < 1960 || values.anio > new Date().getFullYear()) ? true : false;
 		setErrors({
 			chofer: !chofer?.value ? true : false,
 			anio: errAnio,

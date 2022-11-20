@@ -18,6 +18,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import CrearEditarUsuario from './pages/usuarios/CrearEditarUsuario';
 import VerUsuario from './pages/usuarios/VerUsuario';
+import UsuariosEliminados from './pages/usuarios/UsuariosEliminados';
 import UnidadesTransporte from './pages/unidadesTransporte/UnidadesTransporte';
 import CrearEditarUnidad from './pages/unidadesTransporte/CrearEditarUnidad';
 import CrearEditarPedido from './pages/pedidos/CrearEditarPedido';
@@ -84,6 +85,16 @@ function App() {
 						element={
 							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
 								<CambiarContrasenia />
+							</ProtectedRoute>
+						}
+					/>
+
+					<Route
+						path="/recuperar-usuarios"
+						exact
+						element={
+							<ProtectedRoute permisos={[Constantes.PERMISO_ADMINISTRADOR]}>
+								<UsuariosEliminados />
 							</ProtectedRoute>
 						}
 					/>

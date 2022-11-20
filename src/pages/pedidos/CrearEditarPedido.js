@@ -201,7 +201,7 @@ const CrearEditarPedido = () => {
 		const { usuarios, totalRows } = await servicioUsuarios.obtenerUsuarios({ PageIndex: loadedOptions.length, PageSize: 5, filters, Tipo });
 
 		return {
-			options: [...usuarios.map((u) => ({ value: u.idUsuario, label: `${u.nombre} ${u.apellido}`, ...u }))],
+			options: [...usuarios.map((u) => ({ value: u.idUsuario, label: `${u.apellido} ${u.nombre}`, ...u }))],
 			hasMore: loadedOptions.length < totalRows,
 		};
 	}

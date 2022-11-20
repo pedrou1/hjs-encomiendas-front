@@ -98,6 +98,14 @@ const Usuarios = () => {
 				<div className="align-self-end">
 					<Button
 						variant="contained"
+						style={{ fontSize: '15px', fontFamily: 'PT Sans', marginRight: 14 }}
+						component={RouterLink}
+						to="/recuperar-usuarios"
+					>
+						Recuperar usuarios
+					</Button>
+					<Button
+						variant="contained"
 						style={{ fontSize: '15px', fontFamily: 'PT Sans' }}
 						component={RouterLink}
 						to="/crear-usuario"

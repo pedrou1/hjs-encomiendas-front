@@ -57,7 +57,7 @@ const structure = [
 	},
 
 	{ id: 3, label: 'Unidades', link: '/unidades', icon: <TransporteIcon /> },
-	{ id: 4, label: 'Estadísticas', link: '/estadisticas', icon: <BarChart /> },
 	{ id: 5, label: 'Gastos', link: '/gastos', icon: <GastoIcon /> },
+	{ id: 4, label: 'Estadísticas', link: '/estadisticas', icon: <BarChart /> },
 	{ id: 6, label: 'Reservas', link: '/reservas-pedidos', icon: <BorderColorIcon /> },
 ];
